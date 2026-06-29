@@ -1,0 +1,15 @@
+# Build artifacts (the packaged addon is attached to GitHub releases, not committed)
+*.zip
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+*.bak
+*.tmp
+*~
+.vscode/
+.idea/
+
+# Lua bytecode
+*.luac
