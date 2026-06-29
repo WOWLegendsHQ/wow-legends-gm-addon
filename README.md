@@ -5,9 +5,21 @@
 [![WoW 3.3.5a](https://img.shields.io/badge/WoW-3.3.5a%20WotLK-0070dd?style=flat-square)](https://wow-legends.eu)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
 
-An in-game GM toolkit for **[WoW Legends](https://wow-legends.eu)** (WotLK 3.3.5a / AzerothCore). Every command is one click away, with input fields and dropdowns right next to each one — plus dedicated panels for the server's WL-exclusive features and its PlayerBot army.
+An in-game GM toolkit for **[WoW Legends](https://wow-legends.eu/)** (WotLK 3.3.5a / AzerothCore). Every command is one click away, with input fields and dropdowns right next to each one, plus dedicated panels for the server's WL-exclusive features and its PlayerBot army.
+
+> **Made for the [WoW Legends](https://wow-legends.eu/) repack** — a free, self-hosted Wrath of the Lich King (3.3.5a) world with hundreds of AI-driven bots, an AI companion that chats back, hardcore mode, and a one-click installer. Get the server and client at **[wow-legends.eu](https://wow-legends.eu/)**.
 
 ### ⬇ [Download the latest release](https://github.com/WOWLegendsHQ/wow-legends-gm-addon/releases/latest/download/WoWLegends_GM.zip)
+
+---
+
+## Screenshots
+
+![The Legends tab — WoW Legends-exclusive commands](gm_legends.jpg)
+*The ★ Legends tab — Companion, Hardcore, XP rate, Gear, World PvP and Faction Battlefronts (with a per-zone teleporter).*
+
+![The General tab — GM toggles and cheats](gm_general.jpg)
+*General > Toggles — GM mode and cheats, with one-click on/off dropdowns.*
 
 ---
 
