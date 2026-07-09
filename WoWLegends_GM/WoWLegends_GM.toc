@@ -2,7 +2,7 @@
 ## Title: |cffffc94dWoW Legends|r GM
 ## Notes: In-game GM toolkit for WoW Legends (WotLK 3.3.5a / AzerothCore) — every command one click away, plus the WL-exclusive Companion, Hardcore, World PvP, Battlefronts and PlayerBot panels.
 ## Author: WoW Legends (timoinglin)
-## Version: 0.1.5
+## Version: 0.1.6
 ## SavedVariables: WoWLegendsGM_DB
 ## X-Website: https://wow-legends.eu
 ## DefaultState: enabled

@@ -109,6 +109,19 @@ Operates on a targeted bot/player (GM tool; players use `.companion` + addclass 
 | `.hardcore status` | Show your state: FALLEN / ACTIVE / normal. |
 | `.makgora` | Arm a duel-to-the-death with your **targeted player**. Both must be hardcore, target each other, and **both type `.makgora`**; the next normal duel within 30s becomes lethal. Disabled if `Hardcore.Makgora=0`. |
 
+### 1.7 `.path` — Paths of Legends **[P]/[GM]**
+
+Opt-in, per-character challenge Paths sworn at the Herald of the Fallen NPC (every starting zone). A Path binds only the character that swears it. Players swear/forsake **at the Herald**; the command below is player STATUS plus three self-only GM test tools.
+
+| Command | Tier | What it does |
+|---|---|---|
+| `.path` | [P] | Show every Path you've sworn and its status (`sworn` / `FULFILLED` / `WALKED` / `forsaken`; Long Road boss progress included). Example: `.path` |
+| `.path swear <long/iron/pilgrim/slow>` | [GM] | TEST tool. Force-swears a Path on **yourself**, bypassing all guards (level, starting gear) and skipping the realm announce. Default `long`. Run `.path reset` before re-swearing the same Path. Example: `.path swear iron` |
+| `.path credit` | [GM] | TEST tool. Quietly credits your next missing Long Road boss (whisper only). Requires an active Long Road on yourself. Example: `.path credit` |
+| `.path reset` | [GM] | TEST tool. Wipes ALL of your own Path records (cache + database). Example: `.path reset` |
+
+*In-game only (`Console::No`) — these do not run over RA/console.*
+
 ---
 
 ## 2. Playerbot management (dot-commands, `.playerbots ...`)
@@ -311,6 +324,8 @@ These have **no in-game command**; they're `mod_wowlegends.conf` toggles (apply 
 - **Smarter PvP targeting** (healers first) — `SmartPvpTargeting.Enabled` (1).
 - **World PvP mode/schedule** — `WorldPvP.Enabled` (0), `.Mode` (always/timed), `.Timed.IntervalMinutes/DurationMinutes/Announce`.
 - **World Events schedule/tuning** — `WorldEvents.Enabled` (0) + interval/radius/weights/rewards/zone-spawn knobs.
+- **Paths of Legends** — sworn at the Herald NPC (§1.7): `WowLegends.Paths.Enabled` (1), `.MaxLevelToSwear` (4), `.Announce` (1), `.AllowAbandon` (1), `.Trophies.Enabled` (1), `.HeraldHonors.Enabled` (1); per-Path `.LongRoad/.IronOath/.PilgrimsWay/.SlowBurn.Enabled` (1).
+- **Talk-and-command** (natural-language bot orders via whisper — no dot-command) — `WowLegends.AiCommand.Enabled` (0).
 - **Realm MOTD** — NOT a config: it's the `motd` table in the auth DB; change with `.server set motd enUS <text>` (core command).
 
 ---

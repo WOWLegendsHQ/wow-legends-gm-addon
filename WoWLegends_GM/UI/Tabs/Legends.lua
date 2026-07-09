@@ -1,7 +1,7 @@
 -- WoWLegends_GM/UI/Tabs/Legends.lua
 -- ★ The headline tab: WoW Legends-exclusive commands.
--- Companion · Hardcore + Mak'gora · custom XP rate · instant Gear ·
--- World PvP · Faction Battlefronts. Authored from GM_COMMANDS.md (v1.1.0).
+-- Companion · Hardcore + Mak'gora · Paths of Legends · custom XP rate ·
+-- instant Gear · World PvP · Faction Battlefronts. Authored from GM_COMMANDS.md.
 
 local addonName, WLGM = ...
 
@@ -90,6 +90,21 @@ local Hardcore = {
       tooltip="Show your state: FALLEN / ACTIVE (hardcore) / normal." },
     { id="makgora", label="Mak'gora challenge", format=".makgora", level=0, wl=true, group="Legends", danger=true,
       tooltip="Arm a duel to the death with your TARGETED player. Both must be hardcore, target each other, and both run .makgora; the next normal duel within 30s becomes lethal for the loser." },
+}
+
+-- ─── Paths of Legends (Herald of the Fallen challenge Paths) ───────────────
+-- .path status is [P]; swear/credit/reset are self-only GM TEST tools (act on
+-- the caller, bypass the normal Herald-NPC flow). See GM_COMMANDS.md §1.7.
+local PathsRows = {
+    { id="path_status", label="My Paths", format=".path", level=0, wl=true, group="Legends",
+      tooltip="Show every Path of Legends you've sworn and its status (Long Road boss progress included).\nSwear or forsake a Path at the Herald of the Fallen NPC - not here." },
+    { id="path_swear", label="Swear (test)", format=".path swear %s", level=2, wl=true, group="Legends", danger=true,
+      args={ { key="which", placeholder="path", choices={"long","iron","pilgrim","slow"}, width=110 } },
+      tooltip="GM TEST: force-swear a Path on YOURSELF, bypassing all guards, no announce. Default 'long'.\nNormal play swears at the Herald NPC. Run 'Reset Paths' before re-swearing the same one." },
+    { id="path_credit", label="Credit boss (test)", format=".path credit", level=2, wl=true, group="Legends",
+      tooltip="GM TEST: quietly credit your next missing Long Road boss (whisper only). Requires an active Long Road on yourself." },
+    { id="path_reset", label="Reset Paths (test)", format=".path reset", level=2, wl=true, group="Legends", danger=true,
+      tooltip="GM TEST: wipe ALL your own Path records (cache + DB)." },
 }
 
 -- ─── Custom XP rate ────────────────────────────────────────────────────────
@@ -183,6 +198,7 @@ WLGM.RegisterTab({
         WLGM.BuildSubTabs(parent, {
             { label = "Companion",    builder = companionBuilder },
             { label = "Hardcore",     builder = section("Permadeath at level 1 - fall once and the hero is gone for good. Challenge other hardcore players to a lethal Mak'gora duel.", Hardcore) },
+            { label = "Paths",        builder = section("The Herald of the Fallen offers opt-in challenge Paths - the Long Road, the Iron Oath, the Pilgrim's Way, the Slow Burn - sworn by players at the NPC in any starting zone. The buttons below are GM TEST tools that act on your own character; .path shows your own status.", PathsRows) },
             { label = "XP Rate",      builder = section("Set your own leveling pace. Each player controls a personal XP multiplier (1 = blizzlike, up to the server cap).", XP) },
             { label = "Gear",         builder = section("GM tool: instantly gear the targeted bot/player (or yourself). Spec-aware. Players gear up via Companion + bot init tiers instead.", Gear) },
             { label = "World PvP",    builder = section("Open a server-wide World PvP window: everyone is flagged everywhere. Same-faction players, GMs, cities and sanctuaries stay safe.", WorldPvP) },
