@@ -25,10 +25,11 @@ An in-game GM toolkit for **[WoW Legends](https://wow-legends.eu/)** (WotLK 3.3.
 
 ## Highlights
 
-- **★ Legends panel** — the WL-exclusive commands in one place: your permanent **Companion**, **Hardcore** mode + **Mak'gora** duels, personal **XP rate**, instant **Gear**, server-wide **World PvP** windows, and **Faction Battlefronts** with a per-zone teleporter.
-- **PlayerBot command center** — build a party (`.playerbots`), then drive your bots with one-click `$` orders (movement, combat, roles/specs) via a **Party / Whisper** scope switch.
+- **★ Legends panel** — the WL-exclusive commands in one place: your permanent **Companion**, **Hardcore** mode + **Mak'gora** duels, **Paths of Legends**, personal **XP rate**, instant **Gear**, server-wide **World PvP** windows, and **Faction Battlefronts** with a per-zone teleporter.
+- **Dungeon Clear** — one-click control of the autonomous tank-bot dungeon runner (`.dc`): start/stop, pause, skip, pull modes, per-boss routing, spectator camera — and the addon prints the tank's hidden-channel progress announcements right into your chat.
+- **PlayerBot command center** — build a party (`.playerbots`), then drive your bots with one-click `$` orders (movement, combat, roles/specs, travel) via a **Party / Whisper** scope switch — plus a plain-English **Talk & Command** reference (the Guide, the Sage).
 - **The whole AzerothCore command set** — General, Player, Items, NPC, Object, Teleport, Quest, Server, and Moderation, organized into clean, typed rows with dropdowns for fixed choices (race, class, on/off, …).
-- **Searchable reference** — filter all **869** commands by text, access tier, and WL-only; a destination browser over all **1,989** `.teleport` locations.
+- **Searchable reference** — filter all **877** commands by text, access tier, and WL-only; a destination browser over all **1,989** `.teleport` locations.
 - **Quality of life** — current-target readout, danger-command confirmations, favorites, command history, draggable panel + launcher, and remembered input values.
 
 ---
@@ -65,7 +66,7 @@ The **Bots** tab has a scope selector — *All my bots (party)* or *Targeted bot
 
 | Tab | What's inside |
 |---|---|
-| **★ Legends** | Companion · Hardcore + Mak'gora · XP rate · Gear · World PvP · Battlefronts |
+| **★ Legends** | Companion · Hardcore + Mak'gora · Paths · XP rate · Gear · World PvP · Battlefronts |
 | **General** | GM toggles, cheats, morph/mount, self modify (scale/speed), utilities |
 | **Player** | Modify, spells, learn, reset, character ops, stats, instances/groups, guild |
 | **Items** | Add items, send mail/money, bags, lookup |
@@ -73,10 +74,11 @@ The **Bots** tab has a scope selector — *All my bots (party)* or *Targeted bot
 | **Object** | Gameobject add/move/turn/info, lookup |
 | **Teleport** | Searchable browser of all `.teleport` destinations + the full `.go` family |
 | **Quest** | Add/complete/remove/reward, lookup |
-| **Server** | Announce, status, lifecycle (shutdown/restart), reloads, events, saves |
+| **Server** | Announce, status, lifecycle (shutdown/restart), reloads, events, saves, Legend Roads |
 | **Moderation** | Bans, mute, accounts, tickets, deserter |
-| **Bots** | PlayerBot party builder, `$` orders, roles & specs, regear, console tools |
-| **Search** | Filter all 869 commands by text, tier, and WL-only |
+| **Bots** | PlayerBot party builder, `$` orders, roles & specs, travel & guide, Talk & Command reference, regear, console tools |
+| **Dungeon Clear** | Drive the autonomous tank-bot dungeon runner: start/stop/pause/skip, pull modes, go-to-boss, status/bosses, spectate — with the tank's hidden-channel announcements printed to chat |
+| **Search** | Filter all 877 commands by text, tier, and WL-only |
 | **Favorites** / **History** | Pinned commands, and the last commands you sent (click to re-run) |
 
 Sections automatically use one or two columns based on their content, and scroll when long.

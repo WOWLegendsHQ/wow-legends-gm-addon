@@ -154,6 +154,23 @@ local Save = {
       tooltip="Copy an existing character into another account. .pdump copy <playerNameOrGUID> <account> [newname] [newguid]" },
 }
 
+-- ─── Legend Roads + AI telemetry (WL, v1.4.0) ──────────────────────────────
+local WORLD_MAPS = {
+    { text = "0 - Eastern Kingdoms", value = "0" },
+    { text = "1 - Kalimdor",         value = "1" },
+    { text = "530 - Outland",        value = "530" },
+    { text = "571 - Northrend",      value = "571" },
+}
+local LegendRoads = {
+    { id="lr_status", label="Roads status", format=".wlpaths status", level=3, wl=true, group="Server",
+      tooltip="Print the pathways state (ON/OFF, all-bots, comfort slope, climb/water weights), build-job progress if one is running, and every loaded graph with node/edge counts (e.g. 'map 1: 205302 nodes, 615645 edges')." },
+    { id="lr_build", label="Build map graph", format=".wlpaths build %s", level=3, wl=true, group="Server", danger=true,
+      args={ { key="map", placeholder="world map", choices=WORLD_MAPS, width=170 } },
+      tooltip="Build the Legend Roads graph for a WORLD map as a chunked background job (~30 ms per tick - the server stays responsive).\nSaves <DataDir>/pathways/map<id>.wlp and goes live immediately; restart later to release terrain grids. One job at a time." },
+    { id="lr_aistats", label="AI chat stats", format=".aichat stats", level=2, wl=true, group="Server",
+      tooltip="AI-chat telemetry: provider, workers, queue, and Today / Since-start counters (requests, replies, delivered, drops, failures, tokens).\nWith talk-and-command enabled the counters also show 'orders N / parse-miss N'." },
+}
+
 WLGM.RegisterTab({
     id = "server", label = "Server",
     builder = function(parent)
@@ -176,6 +193,9 @@ WLGM.RegisterTab({
             { label = "Save",      builder = section(
                 "Persist characters: force-save everyone online, or export/import individual characters via pdump.",
                 Save) },
+            { label = "Legend Roads", builder = section(
+                "Legend Roads - the world-wide road/path graph the bots walk. The four world maps ship pre-built; rebuild only after changing the baked BotPathways tuning (slope/climb). Admin-level; works from console/RA too.",
+                LegendRoads) },
         }, "server")
     end,
 })

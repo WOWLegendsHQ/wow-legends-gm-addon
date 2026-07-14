@@ -1,5 +1,5 @@
 -- WoWLegends_GM/Data/Teleports.lua
--- AUTO-GENERATED from world.game_tele (1989 destinations).
+-- AUTO-GENERATED from world.game_tele (1989 destinations; run tools/gen_teleports.py).
 -- Each entry: { name, map = friendly continent/zone }. Use with .tele <name>.
 
 local _, WLGM = ...

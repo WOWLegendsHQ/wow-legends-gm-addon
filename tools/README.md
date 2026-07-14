@@ -16,7 +16,7 @@ relative to the repo, so `git clone` + these run anywhere.
 |---|---|---|
 | `luacheck.py` | Parse every addon `.lua` (Lua 5.1) and report syntax errors. | `python tools/luacheck.py` |
 | `run_harness.py` (+ `harness.lua`) | Headless smoke test: stubs the WoW 3.3.5a API, loads the addon in TOC order, fires `PLAYER_LOGIN` (builds every tab over every command), dry-runs `BuildLine` on each command, and fuzz-clicks every control. Prints `PASS`/`FAIL`. | `python tools/run_harness.py` |
-| `gen_catalog.py` | Regenerate `WoWLegends_GM/Data/Catalog.lua` (the 869-command Search index) from `wow-legends.eu/assets/data/commands.js`. | `python tools/gen_catalog.py` |
+| `gen_catalog.py` | Regenerate `WoWLegends_GM/Data/Catalog.lua` (the Search tab's command index) from `wow-legends.eu/assets/data/commands.js`. | `python tools/gen_catalog.py` |
 | `gen_teleports.py` | Regenerate `WoWLegends_GM/Data/Teleports.lua` (the `.teleport` destination browser) from the realm's `game_tele` table. Needs the local DB; override with `WL_DB_HOST/PORT/USER/PASS/NAME`. | `python tools/gen_teleports.py` |
 | `package.py` | Build `WoWLegends_GM.zip` with correct forward-slash entries. **Do not** use PowerShell `Compress-Archive` — it writes backslash paths some extractors turn into broken files. | `python tools/package.py` |
 

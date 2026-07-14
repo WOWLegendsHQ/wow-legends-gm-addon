@@ -1,5 +1,5 @@
 -- WoWLegends_GM/UI/Tabs/Search.lua
--- Browse / search all 869 commands (Data/Catalog.lua) with a virtual scroll
+-- Browse / search the full command catalog (Data/Catalog.lua) with a virtual scroll
 -- list, text filter, per-tier toggles, and a WoW Legends-only toggle.
 
 local addonName, WLGM = ...

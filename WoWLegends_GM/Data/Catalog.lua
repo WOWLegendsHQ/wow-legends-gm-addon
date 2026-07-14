@@ -1,6 +1,6 @@
 -- WoWLegends_GM/Data/Catalog.lua
--- AUTO-GENERATED from wow-legends.eu/commands (do not hand-edit).
--- Full command reference powering the Search tab. 869 commands.
+-- AUTO-GENERATED from wow-legends.eu/commands (do not hand-edit; run tools/gen_catalog.py).
+-- Full command reference powering the Search tab. 877 commands.
 -- Fields: n=name  l=accessLevel(0-5)  g=group  u=usage  d=description  w=WLonly(0/1)
 -- Access tiers: 0 Player | 1 Moderator | 2 Game Master | 3 Administrator | 4 Console | 5 Bot
 
@@ -29,6 +29,10 @@ WLGM.Catalog = {
   {n=".achievement checkall",l=3,g="achievement",u=".achievement checkall",d="Check all achievement criteria of the selected player.",w=0},
   {n=".additem",l=2,g="additem",u=".additem Optional(playerName/playerGUID) <itemID>/[<itemName>]/<itemLink> <itemCount>",d="Adds the specified item to you, the selected character or the specifed character name/GUID. If #itemCount is negative, you will remove #itemID.",w=0},
   {n=".additem set",l=2,g="additem",u=".additemset <itemsetid>",d="Add items from itemset of id #itemsetid to your or selected character inventory. Will add by one example each item from itemset.",w=0},
+  {n=".aichat stats",l=2,g="ai chat",u=".aichat stats",d="Live AI-chat telemetry: requests, replies, deliveries, queue/dedupe drops, failures, real provider-reported token usage (today + since start), and the Living Chatter state - on/off, daily requests used vs MaxRequestsPerDay, lines/scenes/greetings generated. Works in-game and from the remote console.",w=1},
+  {n=".aichat test ambient",l=2,g="ai chat",u=".aichat test ambient",d="Force one AI-generated ambient line from a bot near you within a few seconds. Works even while WowLegends.LivingChatter.Enabled = 0 - it bypasses the master toggle and cooldowns (NOT the daily budget), so you can trial Living Chatter before enabling it. Tells you if no eligible bot is nearby, AI chat is off, or the budget is spent. In-game only (needs a GM character in the world). Valid test options: ambient, scene.",w=1},
+  {n=".aichat test scene",l=2,g="ai chat",u=".aichat test scene",d="Force one two-bot AI-written conversation (a 4-line scene delivered with natural pauses) between two same-faction bots near you. Same bypass rules as test ambient: works while Living Chatter is disabled, bypasses cooldowns but not the daily budget. In-game only. Valid test options: ambient, scene.",w=1},
+  {n="Talk-and-command",l=0,g="ai chat",u="whisper a bot plain language",d="With WowLegends.AiCommand.Enabled, whisper a bot you own in any language and it obeys - follow, stay, attack your current target, etc. See the guide.",w=1},
   {n=".announce",l=2,g="announce",u=".announce <MessageToBroadcast>",d="Send a global message to all players online in chat log.",w=0},
   {n=".appear",l=1,g="appear",u=".appear [<charactername>]",d="Teleport to the given character. Either specify the character name or click on the character's portrait,e.g. when you are in a group. Character can be offline.",w=0},
   {n=".arena captain",l=3,g="arena",u=".arena captain <TeamID> <name>",d="A command to set new captain to the team $name must be in the team",w=0},
@@ -582,6 +586,10 @@ WLGM.Catalog = {
   {n=".npc yell",l=2,g="npc",u=".npc yell <message>",d="Make selected creature yell specified message.",w=0},
   {n=".opendoor",l=2,g="opendoor",u=".opendoor [<range>]",d="Opens the nearest door within the range provided (default 5.0yd)",w=0},
   {n=".packetlog",l=2,g="packetlog",u=".packetlog [on/off]",d="Toggles to allow the character using the command to start to log their packets into the server, PacketLogFile needs to be set with a valid filename",w=0},
+  {n=".path",l=0,g="paths",u=".path",d="Show every Path of Legends you have sworn and its status (The Long Road's boss progress included). Swear or forsake a Path at the Herald of the Fallen NPC, not here.",w=1},
+  {n=".path credit",l=2,g="paths",u=".path credit",d="GM TEST tool. Quietly credits your next missing Long Road boss (whisper only, no announce) so the XP gates can be advanced without clearing a raid. Requires an active Long Road.",w=1},
+  {n=".path reset",l=2,g="paths",u=".path reset",d="GM TEST tool. Wipes ALL of your own Path records from the cache and the database.",w=1},
+  {n=".path swear",l=2,g="paths",u=".path swear <long/iron/pilgrim/slow>",d="GM TEST tool. Force-swears a Path on YOUR OWN character, bypassing every guard (level, starting gear) and skipping the realm announce. Run '.path reset' before re-swearing the same Path.",w=1},
   {n=".pdump",l=3,g="pdump",u=".pdump <subcommand>",d="Type .pdump to see the list of possible subcommands or .help pdump $subcommand to see info on subcommands",w=0},
   {n=".pdump copy",l=3,g="pdump",u=".pdump copy <playerNameOrGUID> <account> [<newname>] [<newguid>]",d="Copy character with name/guid $playerNameOrGUID into character list of $account with $newname, with first free or $newguid guid.",w=0},
   {n=".pdump load",l=3,g="pdump",u=".pdump load <filename> <account> [<newname>] [<newguid>]",d="Load character dump from dump file into character list of $account with saved or $newname, with saved (or first free) or $newguid guid.",w=0},

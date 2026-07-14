@@ -36,7 +36,7 @@ local Party = {
     pb("pb_lookup",   "Classes available", ".playerbots bot lookup",
         "List the classes you can summon with Add class bot."),
     pb("pb_add",      "Add bot by name", ".playerbots bot add %s",
-        "Log the named character(s) in as YOUR bot (you become master). Comma-separate several. Blank = current target.",
+        "Log the named character(s) in as YOUR bot (you become master). Comma-separate several. Blank = current target. Names are case-insensitive.",
         { {key="name",placeholder="Name[,Name2]",fallback="target",width=150} }),
     pb("pb_addacct",  "Add whole account", ".playerbots bot addaccount %s",
         "Add ALL characters on that account/charname as bots at once.",
@@ -104,6 +104,47 @@ local Combat = {
     order("o_reset",    "Reset AI",     "reset botAI", "Reset the bot's AI state.", nil, true),
     order("o_help",     "Bot: help",    "help",        "Bot whispers you its full command list."),
 }
+
+-- ─── Travel & Guide ($ bot-chat, v1.4.0) ───────────────────────────────────
+local Travel = {
+    order("t_hearth", "Use hearthstone", "hearthstone",
+        "The bot really casts its Hearthstone (interruptible cast). In party scope this is the whole squad's 'everyone hearth' button.\nSilent if the stone is on cooldown or missing - the spoken 'go home' order (Talk & Command) answers honestly instead. Not usable in battlegrounds."),
+    order("t_guidestop", "Stop guiding", "wl guide stop",
+        "Cancel an active guide escort ('Alright, staying with you.'). Follow, Stay and Reset AI cancel it too."),
+}
+
+-- ─── Talk & Command reference (v1.4.0) — patterns, not buttons ─────────────
+local function talkBuilder(parent)
+    local scroll, child = WLGM.CreateScrollContent(parent)
+    child:SetWidth(744)
+    local blocks = {
+        { nil,
+          WLGM.colors.muted .. "Talk to your bots in plain English - no commands. Server gate: WowLegends.AiCommand.Enabled = 1 (ships OFF by default; ON on the PTR). The exact phrases below are deterministic and work with NO AI backend configured; free-form sentences need an AI backend. $-prefixed orders always work regardless." .. WLGM.colors.reset },
+        { "Whisper one bot (no $)",
+          "follow - stay - attack - flee - drink - eat - come here - go home - attack the <mob name>\n'go home' pre-checks the hearthstone cooldown ('My hearthstone is still cooling down.'). 'attack the <mob>' finds the mob within 60 yds of YOU and sets your target. The bot answers with one ack ('On it - right behind you.') or an honest refusal ('Pulling is a tank's job - I'm not built for it.')." },
+        { "Talk to the whole group (party/raid/say/yell)",
+          "'everyone follow me' - 'all of you attack the kobold miner' - 'bots go home' - 'you guys stay here'\nThe group answers with ONE voice. Drastic calls (everyone go home / everyone grind) ask you to repeat the order within 45 s before obeying." },
+        { "The Guide - spoken escort",
+          "'take me to / lead me to / guide me to / show me the way to <place>'\nDestinations: teleport-catalog places (booty bay), dungeon entrances, 'my quest', role NPCs (an innkeeper, my trainer, a repair vendor, the auction house, a flight master, the bank, a stable master), starting zones ('the troll starting zone').\nThe bot walks you there by road, yells if you fall behind, and comes back for you. Same continent only ('That's beyond this land - we'd need a ship or zeppelin.').\nGates: WowLegends.BotGuide.Enabled = 1 (default on) + AiCommand on. Zero AI cost - fully deterministic. Cancel via Travel & Guide, $follow or $stay." },
+        { "The Sage - ask about the world",
+          "Question-shaped whispers that name a game entity get answers grounded in this server's REAL data:\n'who sells Refreshing Spring Water?' - 'where is Mankrik?' - 'price of the Bronze Tube?' - 'what does [linked quest] reward?'\nCovers items (prices, vendors + the nearest one with direction), quests (giver, objective, rewards) and NPCs (roles, nearest spawn).\nGate: WowLegends.AiChat.Sage.Enabled = 1 (default on); rides AI chat." },
+    }
+    local y = 8
+    for _, b in ipairs(blocks) do
+        if b[1] then
+            local hdr = WLGM.CreateSectionHeader(child, b[1])
+            hdr:SetPoint("TOPLEFT", child, "TOPLEFT", 8, -y)
+            y = y + hdr:GetHeight() + 4
+        end
+        local fs = child:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        fs:SetPoint("TOPLEFT", child, "TOPLEFT", 8, -y)
+        fs:SetWidth(724)
+        fs:SetJustifyH("LEFT")
+        fs:SetText(b[2])
+        y = y + fs:GetStringHeight() + 14
+    end
+    child:SetHeight(math.max(y, 80))
+end
 
 -- ─── Roles / specs ($talents) ──────────────────────────────────────────────
 local Roles = {
@@ -175,6 +216,12 @@ WLGM.RegisterTab({
                 })
             end },
             { label = "Roles",    rows = Roles,    layoutOpts = { yTop = 8, sectionTitle = "Set roles via spec ($talents)" } },
+            { label = "Travel & Guide", builder = function(p)
+                WLGM.BuildScrollSections(p, { { rows = Travel } },
+                    "Bots can walk you anywhere: spoken phrases like 'take me to booty bay' or 'lead me to an innkeeper' start a guide escort (see Talk & Command). "
+                    .. "The raw $wl guide <mapId> <x> <y> <z> <zTol> [label] form is internal/advanced - the spoken phrases build it for you.")
+            end },
+            { label = "Talk & Command", builder = talkBuilder },
             { label = "Manage",   rows = Manage,   layoutOpts = { rowsPerColumn = 10, columnWidth = 400, sectionTitle = "Regear, re-roll & account linking (.playerbots)" } },
             { label = "Console",  rows = Console,  layoutOpts = { yTop = 8, sectionTitle = "Random-bot population (GM / owner)" } },
         }, "bots")

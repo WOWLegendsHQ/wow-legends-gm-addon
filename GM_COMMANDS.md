@@ -20,7 +20,7 @@ The complete, source-verified spec follows — including permission tags and the
 
 ---
 
-Source-verified against the v1.1.0 build (2026-06-29). This is the authoritative list for building the GM addon: every WL custom command, every playerbot command, the bot chat (`$`) commands, World PvP, World Events (with zones), and XP — plus the option lists for dropdowns.
+Source-verified against the v1.4.0 build (2026-07-14; §§1.1–1.6 originally verified on v1.1.0, §1.7 on v1.3.0 — all unchanged since). This is the authoritative list for building the GM addon: every WL custom command, every playerbot command, the bot chat (`$`) commands, Dungeon Clear, World PvP, World Events (with zones), XP and Legend Roads — plus the option lists for dropdowns.
 
 ---
 
@@ -122,6 +122,39 @@ Opt-in, per-character challenge Paths sworn at the Herald of the Fallen NPC (eve
 
 *In-game only (`Console::No`) — these do not run over RA/console.*
 
+### 1.8 `.dc` — Dungeon Clear **[P]** *(v1.4.0, bundled mod-dungeon-clear; in-game only)*
+
+A TANK BOT autonomously runs the dungeon for the group. Every command acts on the group's **elected leader tank bot** (lowest-GUID tank bot in a party; Main Tank / best-geared tank bot in a raid; a real-player tank is never eligible), and **any real player in that bot's group** may issue them — not master-only. No tank bot in the group → `No tank bot found in your group.`
+
+**WL master gate:** `DungeonClear.Enable = 0` (in `mod_dungeon_clear.conf`) makes every dispatch subcommand refuse with `Dungeon clear is disabled on this server (DungeonClear.Enable).` — `.dc config` and `.dc spectate` have their own handlers (spectate has its own gate).
+
+| Command | Params | What it does |
+|---|---|---|
+| `.dc on` | — | Start the autonomous clear. Tank announces `Dungeon clear enabled. Heading to <boss>.` Refusals (whispered): not in a dungeon / no boss table / `<Name> is dead — rez and try again.` |
+| `.dc off` | — | Full stop + teardown; tank halts instantly; followers revert to following the player. |
+| `.dc skip` | — | Skip the current objective. If a lever/prisoner-style gating event is due it retires THAT first; otherwise skips the boss and re-routes (auto-disables when nothing is left). |
+| `.dc pause` | — | Toggle. Pause holds everyone in place, progress preserved (mid-combat: current fight finishes first). Same command resumes; resume refuses while anyone is dead. A run auto-paused at a closed door auto-resumes when a player opens it. |
+| `.dc pull` | `[on\|off\|dynamic\|dyn]` | Trash pull mode: `on` = Advanced (camp-pull every pack), `off` = Leeroy (walk in, fight in place), `dynamic` = per-pack auto (recommended). No param = cycle Off → On → Dynamic. Works BEFORE `.dc on` too (pre-sets the mode; reply appends `(applies when dungeon clear starts)`). Example: `.dc pull dynamic` |
+| `.dc status` | `[addon\|silent]` | One-liner: `Dungeon clear: on/off. Next boss: <name>. Skipped: <n>.` (+ ` Stalled: <reason>` when stuck). Works while the run is off. `addon`/`silent` suppresses the chat line. |
+| `.dc bosses` | `[addon\|silent]` | Full roster for the dungeon: every boss/objective/event with position and live state (alive / dead / skipped), wing-aware, faction-filtered. Works while the run is off. |
+| `.dc go <boss>` | name substring or creature entry (REQUIRED) | Route the tank straight to that boss: `.dc go herod`, `.dc go 3975`. Un-skips it, clears pause, re-routes, announces `Targeting boss: <name>. Navigating...`. **Dot-command/addon only — there is NO `$dc go` chat form.** |
+| `.dc config` | — | Dumps every `DungeonClear.*` tunable as the module reads it THIS tick; `*` marks a live per-run addon override. Confirms conf edits without `.reload config`. |
+| `.dc spectate` | — | Free-fly spectator camera on the ISSUER (possession dummy; character keeps playing under bot AI). In-dungeon only. Gate: `DungeonClear.SpectateEnable` (default 1); speed: `DungeonClear.SpectateSpeed` (0.5–8, default 2.5). Toggle off with the same command; auto-teardown on death/teleport/logout. |
+
+**Chat forms** (`$dc ...`, whisper the tank or /party — only live while the bot is INSIDE a dungeon; the dot-commands work anywhere): `$dc on` (`$dungeon clear on`) · `$dc off` (`$dungeon clear off`) · `$dc skip` · `$dc pause` (`$dungeon clear pause`) · `$dc pull [on|off|dynamic|dyn]` · `$dc status [addon|silent]` · `$dc bosses [addon|silent]`. There is **no** `$dc go` / `$dc config` / `$dc spectate`, and do NOT document a `dungeon clear pull` long alias (registered upstream but inert).
+
+**⚠️ Hidden-channel display note:** all non-error DC announcements are sent on the hidden addon channel (`LANG_ADDON` party messages, payload `DC\tCHAT\t<text>`) — on a stock client the tank appears silent; only error refusals arrive as visible whispers. The addon listens for the `DC` prefix and prints `CHAT` payloads to the chat frame as `[Dungeon Clear]` lines.
+
+### 1.9 `.wlpaths` — Legend Roads + AI telemetry **[GM/ADMIN]** *(v1.4.0, console OK)*
+
+Legend Roads is the world-wide road/path graph the bots walk (`BotPathways.*` conf keys, §6). The four world maps ship pre-built.
+
+| Command | Security | What it does |
+|---|---|---|
+| `.wlpaths build <mapId>` | Administrator (3), console OK | Builds the Legend Roads graph for a WORLD map (0/1/530/571) as a chunked background job (~30 ms/tick — the server stays responsive; the conf.dist "freezes the world" comment is stale). Saves `<DataDir>/pathways/map<id>.wlp`, goes live immediately; restart later to release terrain grids. One job at a time. Example: `.wlpaths build 571` |
+| `.wlpaths status` | Administrator (3), console OK | Prints `Pathways ON/OFF (all bots: yes/no), comfort N deg, climb xN, water xN`, build-job progress if running, and every loaded graph (`map 1: 205302 nodes, 615645 edges`). |
+| `.aichat stats` | GameMaster (2), console OK | Pre-existing (v1.2.0) AI-chat telemetry. Since v1.4.0 the Today/Since-start lines also append `orders N / parse-miss N` when talk-and-command is on. |
+
 ---
 
 ## 2. Playerbot management (dot-commands, `.playerbots ...`)
@@ -131,7 +164,7 @@ There is **no bare `.bot` alias** — always `.playerbots bot ...`. [P] unless n
 | Command | What it does |
 |---|---|
 | `.playerbots bot list` | Your bots: online (`+`), your offline alts (`-`), randoms in group. |
-| `.playerbots bot add <Name[,Name2,...]>` | Log the named char(s) in as **your** bot (you become master). No name = current target. Cap `MaxAddedBots` (40). |
+| `.playerbots bot add <Name[,Name2,...]>` | Log the named char(s) in as **your** bot (you become master). No name = current target. Names are case-insensitive (since v1.4.0). Cap `MaxAddedBots` (40). |
 | `.playerbots bot addaccount <Account\|CharName>` | Add **all** chars on that account as bots at once. |
 | `.playerbots bot login <Name>` | Same path as `add`. |
 | `.playerbots bot remove <Name>` | Remove/log out one of your bots. Aliases: `logout`, `rm`. |
@@ -205,6 +238,17 @@ A bot's **dungeon role (tank/heal/dps) = its spec.** Set roles by changing spec.
 | `taxi` | take a flight path | | `teleport` | teleport (e.g. to master) |
 | `enter vehicle` / `leave vehicle` | mount/dismount vehicle | | | |
 
+### Travel & guide *(v1.4.0)*
+| Cmd | Effect |
+|---|---|
+| `hearthstone` | The bot really USES its Hearthstone (real, interruptible cast). In /party it's the whole squad's "everyone hearth" button. Silent if the stone is on cooldown or missing (the spoken `go home` order pre-checks and answers `My hearthstone is still cooling down.` instead). Skipped in battlegrounds. Distinct from the old `home` (which only SETS the hearth at an innkeeper). |
+| `wl guide stop` | Cancel an active guide escort (`Alright, staying with you.`). `follow`, `stay` and `reset botAI` also cancel it. |
+| `wl guide <mapId> <x> <y> <z> <zTol> [label...]` | The RAW escort command (internal/advanced — players never type this; the spoken Guide phrases in the Talk & Command section build it). |
+
+### Dungeon Clear (`$dc ...`) *(v1.4.0)*
+Whisper the tank or /party; only live while the bot is INSIDE a dungeon. Full behaviour, refusals and the hidden-channel note: **§1.8**.
+`$dc on` (`$dungeon clear on`) · `$dc off` (`$dungeon clear off`) · `$dc skip` · `$dc pause` (`$dungeon clear pause`) · `$dc pull [on|off|dynamic|dyn]` · `$dc status [addon|silent]` · `$dc bosses [addon|silent]` — no `$dc go`/`config`/`spectate` (dot-command only).
+
 ### Combat
 | Cmd | Effect |
 |---|---|
@@ -261,7 +305,15 @@ A bot's **dungeon role (tank/heal/dps) = its spec.** Set roles by changing spec.
 ### Utility
 `help` (bot whispers its full list) · `reset` / `reset botAI` · `chat` · `emote` · `calc <item>` · `wipe` / `ready` · `trainer` · `cheat <flags>` / `debug <sub>` / `log <level>` *(GM/debug)*
 
-> **Not active in this build:** `hire` (trigger disabled — would crash), `logout` / `wait <sec>` as chat commands (commented out). Plain (non-`$`) whispers feed the AI chat / small-talk, not commands.
+### Talk & Command — plain English, no `$` *(v1.4.0)*
+Gate: `WowLegends.AiCommand.Enabled = 1` (**ships default 0**; ON on the PTR). The exact phrases below are deterministic — they work with NO AI backend configured; free-form sentences go through the LLM (order-vs-chat) only when a backend is set up. `$` commands always work regardless.
+
+- **Whisper your own bot (no `$`):** `follow` / `stay` / `attack` / `flee` / `drink` / `eat` / `come here` / `go home` (pre-checks hearthstone CD) / `attack the <mob name>` (resolves against live enemies within 60 yds of YOU; sets your target). One whispered ack (`On it - right behind you.`) or an honest refusal (`Pulling is a tank's job - I'm not built for it.`).
+- **Group-addressed (party/raid/say/yell):** `everyone follow me` · `all of you attack the kobold miner` · `bots go home` · `you guys stay here`. The group answers with ONE voice. Party-wide `home` and `grind` ask to be repeated within 45 s before obeying (drastic-order confirm). Gate: `WowLegends.AiCommand.PartyOrders.Enabled` (1).
+- **The Guide (spoken escort):** `take me to / lead me to / guide me to / show me the way to <place>`. Destinations: teleport-catalog places (`booty bay`), dungeon entrances on the map, `my quest`, role NPCs (`an innkeeper`, `my trainer`, `a repair vendor`, `the auction house`, `a flight master`, `the bank`, `a stable master`), starting zones (`the troll starting zone`). Walks you there by road, yells if you fall behind, comes back for you. Same continent only (`That's beyond this land - we'd need a ship or zeppelin.`). Gates: `WowLegends.BotGuide.Enabled` (1) + AiCommand on. Zero LLM cost — fully deterministic.
+- **The Sage (data-grounded answers):** plain whispers that are question-shaped and name a game entity — `who sells Refreshing Spring Water?` · `where is Mankrik?` · `price of the Bronze Tube?` · `what does [linked quest] reward?` — answered from real server data: items (prices, vendors + nearest one with direction), quests (giver, objective, rewards), NPCs (roles, nearest spawn). Gate: `WowLegends.AiChat.Sage.Enabled` (1); rides AI chat.
+
+> **Not active in this build:** `hire` (trigger disabled — would crash), `logout` / `wait <sec>` as chat commands (commented out). Plain (non-`$`) whispers feed the AI chat / small-talk — unless they match a Talk & Command pattern above (with `AiCommand.Enabled=1`), in which case they are orders.
 
 ---
 
@@ -325,7 +377,10 @@ These have **no in-game command**; they're `mod_wowlegends.conf` toggles (apply 
 - **World PvP mode/schedule** — `WorldPvP.Enabled` (0), `.Mode` (always/timed), `.Timed.IntervalMinutes/DurationMinutes/Announce`.
 - **World Events schedule/tuning** — `WorldEvents.Enabled` (0) + interval/radius/weights/rewards/zone-spawn knobs.
 - **Paths of Legends** — sworn at the Herald NPC (§1.7): `WowLegends.Paths.Enabled` (1), `.MaxLevelToSwear` (4), `.Announce` (1), `.AllowAbandon` (1), `.Trophies.Enabled` (1), `.HeraldHonors.Enabled` (1); per-Path `.LongRoad/.IronOath/.PilgrimsWay/.SlowBurn.Enabled` (1).
-- **Talk-and-command** (natural-language bot orders via whisper — no dot-command) — `WowLegends.AiCommand.Enabled` (0).
+- **Talk-and-command** (plain-English orders, §4) — `WowLegends.AiCommand.Enabled` (**0 — ships OFF**; ON on the PTR), `WowLegends.AiCommand.PartyOrders.Enabled` (1), `WowLegends.BotGuide.Enabled` (1, the Guide), `WowLegends.AiChat.Sage.Enabled` (1, the Sage).
+- **Legend Roads** (bot road-walking, §1.9) — `BotPathways.Enabled` (1), `.AllBots` (1), `.MaxSlopeDegrees` (20, range 5–45, baked into built data), `.ClimbWeight` (10, 0–100, baked), `.WaterCostFactor` (5, 1–50, live).
+- **Bot behaviour polish (v1.4.0, zero commands)** — `TriageHealer.Enabled` (1, healers prioritize real players), `VoiceCards.Enabled` (1, per-bot personalities), `SpeechGovernor.Enabled` (1, anti chat-spam), `AiChat.NoTrailingQuestions` (1).
+- **Dungeon Clear** — `mod_dungeon_clear.conf` (NEW FILE): `DungeonClear.Enable` (1, WL master switch) + ~30 upstream keys (pull tuning, rest targets, loot floor, `SpectateEnable`, `SpectateSpeed`…). Inspect live values with `.dc config` (§1.8).
 - **Realm MOTD** — NOT a config: it's the `motd` table in the auth DB; change with `.server set motd enUS <text>` (core command).
 
 ---
@@ -334,5 +389,6 @@ These have **no in-game command**; they're `mod_wowlegends.conf` toggles (apply 
 - Send **dot-commands** to the chat edit box verbatim (`.worldpvp start 10`).
 - Send **bot orders** as `$<command>` to **whisper** (one bot) or **PARTY/RAID chat** (all your bots). Never send a bot order without the `$` — it'd post as normal chat / AI-chat.
 - A GM sees/uses everything; gate **[GM]** buttons behind the player's GM status (the server still enforces it).
+- **Dungeon Clear announcements are invisible without a listener** (§1.8): register for `CHAT_MSG_ADDON` prefix `DC` and print `CHAT\t<text>` payloads to the chat frame (errors already arrive as normal whispers). Richer payloads (`STATUS\t…`, `BOSS\t…`) exist on the same prefix for a future status panel.
 - Good panels: **Party builder** (addclass per class + "Summon all" → party `$summon`), **Role setter** (`$talents spec <name>` per bot, auto-pick by class via §3 mapping), **Combat bar** (`$attack`/`$tank attack`/`$pull`/`$max dps`/`$flee`/`$focus heal`), **GM Events** (`.worldpvp start/stop/status`, `.wlevent start <zone>/stop/status` with the §5.5 zone dropdown), **Companion** (`.companion create/summon/dismiss/forget`).
 - Core/standard AzerothCore GM commands (`.tele`, `.go`, `.modify`, `.npc`, `.lookup`, `.ban`, `.account`, `.server`, …) are unchanged from AzerothCore — pull those from the AC wiki; this doc covers only WL-custom + playerbot + the `$` bot orders.
