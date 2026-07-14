@@ -497,18 +497,34 @@ function WLGM.CreateDropdown(parent, width, options, placeholder, onSelect)
     return dd
 end
 
--- ─── Scrollable content holder (with mouse-wheel) ──────────────────────────
+-- ─── Scrollable content holder (working scrollbar + mouse-wheel) ────────────
+-- The scroll frame MUST have a unique name: UIPanelScrollFrameTemplate locates
+-- its scrollbar via _G[name.."ScrollBar"] (ScrollFrame_OnScrollRangeChanged).
+-- With a nil name the thumb/arrows never work and only the wheel scrolls.
+local scrollSeq = 0
 function WLGM.CreateScrollContent(parent)
-    local scroll = CreateFrame("ScrollFrame", nil, parent, "UIPanelScrollFrameTemplate")
+    scrollSeq = scrollSeq + 1
+    local scroll = CreateFrame("ScrollFrame", "WLGM_Scroll" .. scrollSeq, parent, "UIPanelScrollFrameTemplate")
     scroll:SetPoint("TOPLEFT", parent, "TOPLEFT", 4, -4)
     scroll:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", -28, 4)
+
+    local bar = _G[scroll:GetName() .. "ScrollBar"]
+
+    -- Wheel drives the scrollbar so the thumb moves with it and stays clamped.
     scroll:EnableMouseWheel(true)
     scroll:SetScript("OnMouseWheel", function(self, delta)
-        local cur = self:GetVerticalScroll()
-        local max = self:GetVerticalScrollRange()
-        local target = cur - delta * (ROW_HEIGHT * 2)
-        if target < 0 then target = 0 elseif target > max then target = max end
-        self:SetVerticalScroll(target)
+        if bar then
+            bar:SetValue(bar:GetValue() - delta * (ROW_HEIGHT * 2))
+        else
+            local t = self:GetVerticalScroll() - delta * (ROW_HEIGHT * 2)
+            self:SetVerticalScroll(t < 0 and 0 or t)
+        end
+    end)
+
+    -- Sub-tab content is built while hidden, so the scroll range is 0 until the
+    -- tab is first shown; refresh it on show so the thumb/arrows appear.
+    scroll:SetScript("OnShow", function(self)
+        if ScrollFrame_OnScrollRangeChanged then ScrollFrame_OnScrollRangeChanged(self) end
     end)
 
     local content = CreateFrame("Frame", nil, scroll)

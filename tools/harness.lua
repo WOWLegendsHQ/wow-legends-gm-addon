@@ -33,6 +33,7 @@ function methods.GetID(self) return self._id or 1 end
 function methods.SetID(self, n) self._id = n; return self end
 function methods.IsShown() return false end
 function methods.GetObjectType() return "Frame" end
+function methods.GetName(self) return self._name end
 function methods.CreateFontString() return newFrame() end
 function methods.CreateTexture() return newFrame() end
 function methods.GetFontString(self) self._fs = self._fs or newFrame(); return self._fs end
@@ -72,7 +73,7 @@ end
 FrameMT = { __index = methods }
 
 -- ─── Globals ────────────────────────────────────────────────────────────────
-CreateFrame = function(_, name) local f = newFrame(); if name then _G[name] = f end; return f end
+CreateFrame = function(_, name) local f = newFrame(); f._name = name; if name then _G[name] = f end; return f end
 UIParent = newFrame()
 DEFAULT_CHAT_FRAME = { AddMessage = function(_, msg) table.insert(MSGS, msg or "") end }
 GameTooltip = newFrame()
