@@ -97,6 +97,7 @@ GetNumRaidMembers = function() return 0 end
 GetNumPartyMembers = function() return 0 end
 UnitName = function() return "Tester" end
 UnitClass = function() return "Warrior", "WARRIOR" end
+UnitIsPlayer = function() return true end
 UnitFactionGroup = function() return "Alliance" end
 wipe = function(t) for k in pairs(t) do t[k] = nil end return t end
 
@@ -116,7 +117,7 @@ UIDropDownMenu_SetSelectedValue = function() end
 -- ─── Load addon in TOC order ────────────────────────────────────────────────
 local files = {
     "Core/Init.lua", "Core/Util.lua", "Core/SavedVars.lua", "Core/CommandRunner.lua",
-    "Data/Catalog.lua", "Data/Teleports.lua",
+    "Data/Catalog.lua", "Data/CatalogLocal.lua", "Data/Teleports.lua",
     "UI/ConfirmDialog.lua", "UI/Widgets.lua", "UI/MainFrame.lua",
     "UI/Tabs/Legends.lua", "UI/Tabs/General.lua", "UI/Tabs/Player.lua", "UI/Tabs/Items.lua",
     "UI/Tabs/NPC.lua", "UI/Tabs/Object.lua", "UI/Tabs/Teleport.lua", "UI/Tabs/Quest.lua",

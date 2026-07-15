@@ -147,13 +147,120 @@ local function talkBuilder(parent)
 end
 
 -- ─── Roles / specs ($talents) ──────────────────────────────────────────────
+-- The SET command matches the PREMADE config name exactly ('prot pve'), NOT
+-- the tree name the bot reports ('protection'). Report != command - that
+-- mismatch is why typing it by hand kept failing. Map verified verbatim
+-- against the live PTR playerbots.conf (AiPlayerbot.PremadeSpecName.*),
+-- 2026-07-15. If the conf ever renames a spec, the conf wins.
+local SPECS = {
+    WARRIOR = { {"Arms","arms pve","DPS"}, {"Fury","fury pve","DPS"}, {"Protection","prot pve","Tank"},
+                {"Arms (PvP)","arms pvp","DPS"}, {"Fury (PvP)","fury pvp","DPS"}, {"Protection (PvP)","prot pvp","Tank"} },
+    PALADIN = { {"Holy","holy pve","Healer"}, {"Protection","prot pve","Tank"}, {"Retribution","ret pve","DPS"},
+                {"Holy (PvP)","holy pvp","Healer"}, {"Protection (PvP)","prot pvp","Tank"}, {"Retribution (PvP)","ret pvp","DPS"} },
+    HUNTER  = { {"Beast Mastery","bm pve","DPS"}, {"Marksmanship","mm pve","DPS"}, {"Survival","surv pve","DPS"},
+                {"Beast Mastery (PvP)","bm pvp","DPS"}, {"Marksmanship (PvP)","mm pvp","DPS"}, {"Survival (PvP)","surv pvp","DPS"} },
+    ROGUE   = { {"Assassination","as pve","DPS"}, {"Combat","combat pve","DPS"}, {"Subtlety","subtlety pve","DPS"},
+                {"Assassination (PvP)","as pvp","DPS"}, {"Combat (PvP)","combat pvp","DPS"}, {"Subtlety (PvP)","subtlety pvp","DPS"} },
+    PRIEST  = { {"Discipline","disc pve","Healer"}, {"Holy","holy pve","Healer"}, {"Shadow","shadow pve","DPS"},
+                {"Discipline (PvP)","disc pvp","Healer"}, {"Holy (PvP)","holy pvp","Healer"}, {"Shadow (PvP)","shadow pvp","DPS"} },
+    -- WotLK DKs tank via Frost Presence + gear in ANY tree - no role tags here
+    -- on purpose (don't promise a clean DK tank/dps split).
+    DEATHKNIGHT = { {"Blood","blood pve"}, {"Frost","frost pve"}, {"Unholy","unholy pve"},
+                {"Blood (Double Aura)","double aura blood pve"},
+                {"Blood (PvP)","blood pvp"}, {"Frost (PvP)","frost pvp"}, {"Unholy (PvP)","unholy pvp"} },
+    SHAMAN  = { {"Elemental","ele pve","DPS"}, {"Enhancement","enh pve","DPS"}, {"Restoration","resto pve","Healer"},
+                {"Elemental (PvP)","ele pvp","DPS"}, {"Enhancement (PvP)","enh pvp","DPS"}, {"Restoration (PvP)","resto pvp","Healer"} },
+    MAGE    = { {"Arcane","arcane pve","DPS"}, {"Fire","fire pve","DPS"}, {"Frost","frost pve","DPS"}, {"Frostfire","frostfire pve","DPS"},
+                {"Arcane (PvP)","arcane pvp","DPS"}, {"Fire (PvP)","fire pvp","DPS"}, {"Frost (PvP)","frost pvp","DPS"} },
+    WARLOCK = { {"Affliction","affli pve","DPS"}, {"Demonology","demo pve","DPS"}, {"Destruction","destro pve","DPS"},
+                {"Affliction (PvP)","affli pvp","DPS"}, {"Demonology (PvP)","demo pvp","DPS"}, {"Destruction (PvP)","destro pvp","DPS"} },
+    DRUID   = { {"Balance","balance pve","DPS"}, {"Feral (Bear)","bear pve","Tank"}, {"Feral (Cat)","cat pve","DPS"}, {"Restoration","resto pve","Healer"},
+                {"Balance (PvP)","balance pvp","DPS"}, {"Feral (Cat) (PvP)","cat pvp","DPS"}, {"Restoration (PvP)","resto pvp","Healer"} },
+}
+
 local Roles = {
     order("r_report",  "Current spec",  "talents",          "Report the bot's current spec + help."),
-    order("r_list",    "List specs",    "talents spec list","List this class's premade specs (point spreads)."),
-    order("r_set",     "Set spec",      "talents spec %s",  "Switch to a named spec - this sets tank/heal/dps.\nWarrior: arms fury protection | Paladin: holy protection retribution | Hunter: beast mastery / marksmanship / survival | Rogue: assasination combat subtlety | Priest: discipline holy shadow | DK: blood frost unholy | Shaman: elemental enhancement restoration | Mage: arcane fire frost | Warlock: affliction demonology destruction | Druid: balance / feral combat / restoration.", { {key="spec",placeholder="spec name",width=150} }),
+    order("r_list",    "List spec names", "talents spec list", "Whisper the bot for its OWN valid premade spec names, live from the server config. These are exactly the names the dropdown above sends."),
+    order("r_autogear","Autogear",      "autogear",         "Equip the best available gear for the bot's CURRENT spec. Runs automatically after the spec dropdown; use this to re-gear manually any time."),
     order("r_switch",  "Dual-spec",     "talents switch %s","Activate primary (1) or secondary (2) spec.", { {key="n",placeholder="1 or 2",numeric=true,width=70} }),
     order("r_autopick","Auto-pick tree","talents autopick", "Auto-pick a full talent tree for the level."),
 }
+
+-- Target-aware spec dropdown: pick a spec for the TARGETED bot; the addon
+-- whispers '$talents spec <premade name>' and then auto-fires '$autogear'
+-- (a spec change alone does not re-gear - a fresh tank would have no shield).
+local AUTOGEAR_DELAY = 1.5
+local function rolesBuilder(parent)
+    local scroll, child = WLGM.CreateScrollContent(parent)
+    child:SetWidth(744)
+
+    local info = child:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    info:SetPoint("TOPLEFT", child, "TOPLEFT", 8, -8)
+    info:SetWidth(724)
+    info:SetJustifyH("LEFT")
+    info:SetText(WLGM.colors.muted
+        .. "A bot's dungeon role (tank / healer / dps) IS its spec. Target a bot and pick a spec below: the addon whispers the exact "
+        .. "premade name the server expects (e.g. 'prot pve' - NOT the tree name the bot reports, so no more 'Spec protection not found'), "
+        .. "then auto-fires $autogear so the bot re-gears for the new spec (shield for a fresh tank, etc.)." .. WLGM.colors.reset)
+
+    local y = 8 + info:GetStringHeight() + 14
+
+    local targetFS = child:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    targetFS:SetPoint("TOPLEFT", child, "TOPLEFT", 8, -y)
+    y = y + 24
+
+    local setLbl = child:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    setLbl:SetPoint("TOPLEFT", child, "TOPLEFT", 8, -y - 4)
+    setLbl:SetText(WLGM.colors.label .. "Set spec:" .. WLGM.colors.reset)
+
+    local dd = WLGM.CreateChoice(child, 250, 22, {}, "pick a spec...", function(send)
+        local bot = UnitName("target")
+        if WLGM.IsBlank(bot) or not UnitIsPlayer("target") then
+            WLGM.Warn("target one of your bots first.")
+            return
+        end
+        WLGM.RunBotOrder("talents spec " .. send, { scope = "whisper", bot = bot })
+        WLGM.After(AUTOGEAR_DELAY, function()
+            WLGM.RunBotOrder("autogear", { scope = "whisper", bot = bot })
+        end)
+        WLGM.Print("spec '" .. send .. "' -> " .. WLGM.colors.accent .. bot .. WLGM.colors.reset .. " (autogear follows)")
+    end)
+    dd:SetPoint("LEFT", setLbl, "RIGHT", 10, 0)
+    y = y + 30
+
+    local function refresh()
+        local name = UnitName("target")
+        local specs
+        if name and name ~= "" and UnitIsPlayer("target") then
+            local _, token = UnitClass("target")
+            specs = token and SPECS[token]
+        end
+        if specs then
+            local opts = {}
+            for _, s in ipairs(specs) do
+                opts[#opts + 1] = { text = s[1] .. (s[3] and ("  -  " .. s[3]) or ""), value = s[2] }
+            end
+            dd.SetChoices(opts)
+            dd.SetValue(nil)
+            local cls = UnitClass("target")
+            targetFS:SetText(WLGM.colors.muted .. "Bot: " .. WLGM.colors.reset
+                .. WLGM.colors.accent .. name .. WLGM.colors.reset
+                .. WLGM.colors.muted .. "  (" .. (cls or "?") .. ")" .. WLGM.colors.reset)
+        else
+            dd.SetChoices({})
+            dd.SetValue(nil)
+            targetFS:SetText(WLGM.colors.warn .. "Target one of your bots to set its spec." .. WLGM.colors.reset)
+        end
+    end
+    local watcher = CreateFrame("Frame", nil, child)
+    watcher:RegisterEvent("PLAYER_TARGET_CHANGED")
+    watcher:SetScript("OnEvent", refresh)
+    parent:HookScript("OnShow", refresh)
+    refresh()
+
+    local h = WLGM.LayoutRows(child, Roles, { yTop = y + 6, sectionTitle = "Talents & gear ($ orders - respect the scope switch above)" })
+    child:SetHeight(math.max(h, 200))
+end
 
 -- ─── Console (GM/owner: random-bot population) ─────────────────────────────
 local Console = {
@@ -215,7 +322,7 @@ WLGM.RegisterTab({
                     { title = "Combat",   rows = Combat },
                 })
             end },
-            { label = "Roles",    rows = Roles,    layoutOpts = { yTop = 8, sectionTitle = "Set roles via spec ($talents)" } },
+            { label = "Roles",    builder = rolesBuilder },
             { label = "Travel & Guide", builder = function(p)
                 WLGM.BuildScrollSections(p, { { rows = Travel } },
                     "Bots can walk you anywhere: spoken phrases like 'take me to booty bay' or 'lead me to an innkeeper' start a guide escort (see Talk & Command). "

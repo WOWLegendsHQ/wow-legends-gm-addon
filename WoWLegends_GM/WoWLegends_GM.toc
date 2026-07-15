@@ -2,7 +2,7 @@
 ## Title: |cffffc94dWoW Legends|r GM
 ## Notes: In-game GM toolkit for WoW Legends (WotLK 3.3.5a / AzerothCore) — every command one click away, plus the WL-exclusive Companion, Hardcore, Paths, World PvP, Battlefronts, Dungeon Clear and PlayerBot panels.
 ## Author: WoW Legends (timoinglin)
-## Version: 0.2.0
+## Version: 0.2.1
 ## SavedVariables: WoWLegendsGM_DB
 ## X-Website: https://wow-legends.eu
 ## DefaultState: enabled
@@ -15,6 +15,7 @@ Core\CommandRunner.lua
 
 # ─── Data ─────────────────────────────────────────────────────────────────
 Data\Catalog.lua
+Data\CatalogLocal.lua
 Data\Teleports.lua
 
 # ─── UI primitives ────────────────────────────────────────────────────────

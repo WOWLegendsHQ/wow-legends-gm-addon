@@ -195,9 +195,9 @@ A bot's **dungeon role (tank/heal/dps) = its spec.** Set roles by changing spec.
 
 | Command | What it does |
 |---|---|
-| `$talents` | Report current spec + help. |
-| `$talents spec list` | List the class's premade specs with point spreads. |
-| `$talents spec <name>` | Switch to a named spec (must match the list). **This is how you set tank/heal/dps.** Specs in §5.2. |
+| `$talents` | Report current spec + help. **The tree name it reports is NOT the name the set-command takes** (see below). |
+| `$talents spec list` | List the bot's valid **premade** spec names, live from the server config. These exact strings are what `spec <name>` accepts. |
+| `$talents spec <premadeName>` | Switch to a premade spec (**this is how you set tank/heal/dps**). `<premadeName>` is matched **exactly, case-sensitive, spaces included** against the `AiPlayerbot.PremadeSpecName.*` config names — e.g. `talents spec prot pve`. The friendly tree name fails: `talents spec protection` → *"Spec protection not found."* Full name map in §5.2. ⚠️ A spec change does NOT re-gear — follow with `$autogear` (the addon's Roles dropdown does both automatically). |
 | `$talents switch <1\|2>` | Activate primary/secondary dual-spec (auto-trains dual spec for `2` if eligible). |
 | `$talents autopick` | Auto-pick a full tree for the level. |
 | `$talents apply <link>` | Apply a specific talent link. |
@@ -322,19 +322,24 @@ Gate: `WowLegends.AiCommand.Enabled = 1` (**ships default 0**; ON on the PTR). T
 ### 5.1 Classes — `addclass` and `.companion create`
 `warrior` · `paladin` · `hunter` · `rogue` · `priest` · `dk` *(also `deathknight`)* · `shaman` · `mage` · `warlock` · `druid`
 
-### 5.2 Specs per class — `$talents spec <name>`
-| Class | Specs |
+### 5.2 Specs per class — `$talents spec <premadeName>` *(corrected 2026-07-15)*
+
+**The command takes the PREMADE config name (send-as column), matched exactly — lowercase, spaces included.** The friendly tree names the bot *reports* (`protection`, `restoration`, …) are **not** accepted (`Spec protection not found`). Verified verbatim against the live PTR `playerbots.conf` (`AiPlayerbot.PremadeSpecName.<class>.<n>`); the conf is authoritative if a name ever changes — `$talents spec list` prints a bot's own live list. ⚠️ Spec change alone does NOT re-gear — follow with `$autogear`.
+
+| Class | Send-as (label · role) |
 |---|---|
-| Warrior | arms, fury, protection |
-| Paladin | holy, protection, retribution |
-| Hunter | beast mastery, marksmanship, survival |
-| Rogue | assasination *(one 's' in-engine)*, combat, subtlety |
-| Priest | discipline, holy, shadow |
-| Death Knight | blood, frost, unholy |
-| Shaman | elemental, enhancement, restoration |
-| Mage | arcane, fire, frost |
-| Warlock | affliction, demonology, destruction |
-| Druid | balance, feral combat, restoration |
+| Warrior | `arms pve` (Arms · DPS) · `fury pve` (Fury · DPS) · `prot pve` (Protection · **Tank**) · `arms pvp` · `fury pvp` · `prot pvp` |
+| Paladin | `holy pve` (Holy · **Healer**) · `prot pve` (Protection · **Tank**) · `ret pve` (Retribution · DPS) · `holy pvp` · `prot pvp` · `ret pvp` |
+| Hunter *(all DPS)* | `bm pve` (Beast Mastery) · `mm pve` (Marksmanship) · `surv pve` (Survival) · `bm pvp` · `mm pvp` · `surv pvp` |
+| Rogue *(all DPS)* | `as pve` (Assassination) · `combat pve` (Combat) · `subtlety pve` (Subtlety) · `as pvp` · `combat pvp` · `subtlety pvp` |
+| Priest | `disc pve` (Discipline · **Healer**) · `holy pve` (Holy · **Healer**) · `shadow pve` (Shadow · DPS) · `disc pvp` · `holy pvp` · `shadow pvp` |
+| Death Knight | `blood pve` · `frost pve` · `unholy pve` · `double aura blood pve` (Double Aura) · `blood pvp` · `frost pvp` · `unholy pvp` — *DKs tank in ANY tree (Frost Presence + gear), so no tank/dps tags here* |
+| Shaman | `ele pve` (Elemental · DPS) · `enh pve` (Enhancement · DPS) · `resto pve` (Restoration · **Healer**) · `ele pvp` · `enh pvp` · `resto pvp` |
+| Mage *(all DPS)* | `arcane pve` (Arcane) · `fire pve` (Fire) · `frost pve` (Frost) · `frostfire pve` (Frostfire, PvE only) · `arcane pvp` · `fire pvp` · `frost pvp` |
+| Warlock *(all DPS)* | `affli pve` (Affliction) · `demo pve` (Demonology) · `destro pve` (Destruction) · `affli pvp` · `demo pvp` · `destro pvp` |
+| Druid | `balance pve` (Balance · DPS) · `bear pve` (Feral Bear · **Tank**) · `cat pve` (Feral Cat · DPS) · `resto pve` (Restoration · **Healer**) · `balance pvp` · `cat pvp` · `resto pvp` — *no bear pvp* |
+
+The addon's **Bots → Roles** dropdown drives all of this: pick a friendly label, it whispers the exact premade name and auto-runs `$autogear`.
 
 ### 5.3 `init=` tiers — `.playerbots bot init=<tier> <target>`
 `auto` (scale to your gear) · `white`/`common` · `green`/`uncommon` · `blue`/`rare` · `purple`/`epic` · `legendary` · or a numeric **gearscore**. Target: a bot name, `*` (your group), `!` (all bots, GM).
