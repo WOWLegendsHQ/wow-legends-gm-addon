@@ -20,7 +20,7 @@ The complete, source-verified spec follows — including permission tags and the
 
 ---
 
-Source-verified against the v1.4.0 build (2026-07-14; §§1.1–1.6 originally verified on v1.1.0, §1.7 on v1.3.0 — all unchanged since). This is the authoritative list for building the GM addon: every WL custom command, every playerbot command, the bot chat (`$`) commands, Dungeon Clear, World PvP, World Events (with zones), XP and Legend Roads — plus the option lists for dropdowns.
+Source-verified against the v1.5.0 build (§1.10 + §5.6 Warband Camps, 2026-08-09, read from the shipped `wowlegends_warbandcamp.cpp`); §§1.1–1.9 verified against v1.4.0 (2026-07-14; §§1.1–1.6 originally on v1.1.0, §1.7 on v1.3.0 — all unchanged since). This is the authoritative list for building the GM addon: every WL custom command, every playerbot command, the bot chat (`$`) commands, Dungeon Clear, Warband Camps, World PvP, World Events (with zones), XP and Legend Roads — plus the option lists for dropdowns.
 
 ---
 
@@ -154,6 +154,31 @@ Legend Roads is the world-wide road/path graph the bots walk (`BotPathways.*` co
 | `.wlpaths build <mapId>` | Administrator (3), console OK | Builds the Legend Roads graph for a WORLD map (0/1/530/571) as a chunked background job (~30 ms/tick — the server stays responsive; the conf.dist "freezes the world" comment is stale). Saves `<DataDir>/pathways/map<id>.wlp`, goes live immediately; restart later to release terrain grids. One job at a time. Example: `.wlpaths build 571` |
 | `.wlpaths status` | Administrator (3), console OK | Prints `Pathways ON/OFF (all bots: yes/no), comfort N deg, climb xN, water xN`, build-job progress if running, and every loaded graph (`map 1: 205302 nodes, 615645 edges`). |
 | `.aichat stats` | GameMaster (2), console OK | Pre-existing (v1.2.0) AI-chat telemetry. Since v1.4.0 the Today/Since-start lines also append `orders N / parse-miss N` when talk-and-command is on. |
+
+### 1.10 `.camp` — Warband Camps **[P]/[GM]/[ADMIN]** *(v1.5.0, ships OFF, in-game only except `diag`)*
+
+A permanent personal camp on any patch of open world. The camp belongs to the **ACCOUNT** — every character on it shares one camp — and it is **phased**: only players within 40 yd of the centre see it (`ViewDistance`, §6), no invite needed, friends just walk in. Props are placed **in front of the player** from a fixed 69-piece catalogue (§5.6); the owner's other characters log in as bots and gather round the fire.
+
+**WL master gate:** `WowLegends.WarbandCamp.Enabled = 0` — **ships OFF** (a world-changing feature, so the owner opts in; ON on the PTR). While off, every subcommand answers `Warband Camps are not enabled on this realm.` **Probe with bare `.camp` and hide/grey the UI on that reply** — there is no other way to read the gate in-game.
+
+| Command | Tier | What it does |
+|---|---|---|
+| `.camp` | [P] | Status. No camp → `You have no Warband Camp yet. Stand somewhere you like and use .camp claim.` (+ a line saying the camp belongs to the account). Has one → `Your Warband Camp is in <zone>, with N of M things set up.` — or `... with N things set up.` when `MaxProps=0` (unlimited). **Parse both forms and read the prop cap from here; never hardcode it.** Example: `.camp` |
+| `.camp claim` | [P] | Founds the camp where you stand. Already own one → describes it + `Give it up with .camp leave first if you want to move.` Refusals are one-line and self-explaining — instance / battleground / arena / sanctuary / capital city / indoors / water / flying / falling / mid-air / dead / in combat / on a transport / no solid ground / not on the ground itself — plus `Somebody else is camped too close to here.` (150-yard separation) and `This corner of the world is crowded with camps.` **Display them verbatim; do not enumerate them in the UI.** Example: `.camp claim` |
+| `.camp leave` → `.camp leave confirm` | [P] | **Two-step on the server too.** The bare form re-describes the camp, warns `This cannot be undone` and instructs `Type .camp leave confirm if you are sure.`; only the `confirm` form destroys the camp and every prop → `You have struck camp. The ground is free again.` Also un-parks the gathered alts (they stay logged in). Example: `.camp leave confirm` |
+| `.camp go` | [P] | Teleport to your own camp. **5-minute cooldown** → `You must rest before travelling again (N seconds).` Blocked in combat, under stun/fear/confuse/root, while dead or a ghost, in flight, falling, being teleported, in a BG/arena, spectating, inside an instance — and by the **Pilgrim's Way** oath (§1.7: `You swore the Pilgrim's Way. Every mile on your own two feet.`). The cooldown is charged only if the teleport was actually accepted. Example: `.camp go` |
+| `.camp visit <name>` | [P] | Travel to another player's camp, by **character** name (the camp itself belongs to their account). Arrives ~12 yd off-centre facing in; replies `Travelling to <Name>'s camp.` **Shares the 5-minute `go` cooldown and the same travel blockers.** `No character called X on this realm.` · `X has not claimed a camp.` · your own camp → `That is your own camp - .camp go.` Example: `.camp visit Aeonflux` |
+| `.camp list` | [P] | Who is camped **on your current continent**, nearest first — header `N camps on this continent, M in the world:`, then up to **8** rows `<owner> in <zone> (N yards away)` (+ `...and N more.`), then a `.camp visit <name>` hint. Owner = that account's most recently played character. Empty realm → `Nobody has claimed a camp yet.` Example: `.camp list` |
+| `.camp props` | [P] | Prints every catalogue **key**, three per line, then `Stand where you want it and use .camp place <name>.` The keys are the §5.6 list. Example: `.camp props` |
+| `.camp place <name>` | [P] | Puts one thing up **in front of you** (bigger props stand further out; standing on a table places at table height, not the floor). You must be **within 32 yd of the camp centre and on the ground**. Success: `<Label> set up (N of M).` / `<Label> set up (N so far).` **3-second per-prop cooldown** → debounce the button; too fast = `Steady on - one thing at a time.` Other replies: `Place what? .camp props lists everything.` · `There is no 'X'. Try .camp props.` (name matching is case-insensitive) · `You have to be standing in your camp. .camp go will take you there.` · `Put your feet on the ground first.` · `Your camp is full (N things). Take something down with .camp remove.` · `That is right on the edge of your camp, so it went down at your feet.` (info, not an error) · `That would not stand up here. Try a step to one side.` · `That could not be saved. Please tell an admin.` (server-side DB problem). Example: `.camp place campfire` |
+| `.camp remove` | [P] | Packs away the **nearest prop within 10 yd** → `<Label> packed away.` Nothing that close → `Stand closer to whatever you want to take down.` Nothing placed at all → `There is nothing set up here yet.` Must be standing in the camp. Example: `.camp remove` |
+| `.camp alts` | [P] | Wakes your other characters as bots and seats them round the fire — **max 8**, ungrouped, follow stood down, quietly strolling the camp. Normally automatic at login (`AutoAlts=1`, §6); this is the manual re-gather. Must be standing in the camp. Replies `Your warband is being roused - they will gather at the fire over the next few moments.` / `You have no other characters on this realm.` To take one adventuring, **whisper that alt `follow`** — a bot order, not a dot-command. Example: `.camp alts` |
+| `.camp catalogue` | **[GM]** | Screenshot rig, **not** a player tool: **wipes your own camp's props**, then lays the ENTIRE catalogue out on an 8x8 grid around you and lists the labels in placement order (centre outward), so every prop can be photographed. You must be standing in the camp. Slots that fail the flatness check are skipped → `Catalogue laid out: N placed, M skipped (K slots passed the flatness check).` + `Not enough level ground here for all of them - try somewhere flatter, Mulgore is ideal.` Example: `.camp catalogue` |
+| `.camp diag <name>` | **[ADMIN]** *(console/RA OK)* | Admin self-test aimed at any **online** character (a bot will do — it takes a NAME, not a selection, precisely so it runs from RA). Reports map/zone/area/position, outdoors + ground delta + water + phase mask, whether a claim would be `ALLOWED` (or the blocker string), the phase bit it would hand out and the realm's camp count — then really spawns one prop through the real spawn path, proves it exists in the map, and takes it back out. Also exercises the proximity-phase pipeline with a throwaway camp. `No online character called 'X'.` **The only `.camp` subcommand that works from RA/console.** Example: `.camp diag Claudius` |
+
+*Everything except `diag` is `Console::No` — in-game only, exactly like `.path` (§1.7) and `.dc` (§1.8). All replies arrive as **CHAT_MSG_SYSTEM** lines carrying `|cffffff00…|r` colour codes: strip the codes before matching.*
+
+⚠️ **Repack version:** `.camp` needs **repack v1.5.0 or newer**. Supporters have it; the free lane is still on v1.4.2 — do not present camp features as available to everyone.
 
 ---
 
@@ -372,6 +397,28 @@ Pass the zone **name** (keyword) or its **1-based index**; no arg = random. The 
 
 *(These are the fixed zone spots the event uses; a live battlefront's exact banner location is also reported by `.wlevent status`.)*
 
+### 5.6 Warband Camp props — `.camp place <key>` *(v1.5.0, 69 items)*
+
+The **key** is what `.camp place` takes (case-insensitive); the **label** is what the server calls it back in `<Label> set up (...)`. Categories are for grouping a dropdown — the server has no query API for this list, so hardcode it and re-check it against the module on every repack release (`.camp props` prints the keys in catalogue order, which is also the order `.camp catalogue` lays them out).
+
+| Category | key = Label |
+|---|---|
+| Shelter | `tent`=Tent · `tent-a`=Alliance Tent · `tent-h`=Horde Tent · `foodtent`=Food Tent |
+| Fire & Light | `campfire`=Campfire · `bonfire`=Bonfire · `brazier`=Brazier · `lantern`=Lantern |
+| Furniture | `table`=Table · `chair`=Chair · `bench`=Bench · `rug`=Rug · `bookshelf`=Bookshelf · `bookcase`=Bookcase |
+| Storage | `crate`=Supply Crate · `crate-h`=Horde Crate · `barrel`=Barrel · `keg`=Keg · `cauldron`=Cauldron · `cookpot`=Cook Pot |
+| Yard | `wagon`=Wagon · `haystack`=Haystack · `haybale`=Hay Bale · `woodpile`=Wood Pile · `logpile`=Log Pile · `fence`=Fence · `rockwall`=Rockwall Fence · `pumpkin`=Pumpkin |
+| Craft | `anvil`=Anvil · `forge`=Forge · `coals`=Forge Coals · `weaponrack`=Weapon Rack |
+| Banners | `banner`=Banner · `banner-a`=Alliance Banner · `banner-h`=Horde Banner |
+| Lights | `torch`=Torch · `candle`=Candle · `candelabra`=Candelabra |
+| Food & Provisions | `sack`=Grain Sack · `basket`=Basket · `corn`=Basket of Corn · `bucket`=Bucket · `bottle`=Bottle · `bread`=Bread · `food`=Spread of Food · `chest`=Chest |
+| Atmosphere | `skull`=Skull · `totem`=Totem · `gong`=Gong · `drum`=Drum · `statue`=Jade Statue · `grave`=Grave · `cage`=Cage · `anchor`=Anchor · `signpost`=Signpost · `scroll`=Scroll · `shovel`=Shovel |
+| Nature | `mushroom`=Giant Mushroom · `flower`=Flowers · `bush`=Bush |
+| Professions | `alchemy`=Alchemy Table · `fishing`=Fishing Gear |
+| Buildings | `cottage`=Cottage · `beertent`=Beer Tent · `pavilion`=Pavilion · `bigtent`=Large Tent · `stable`=Stable · `doghouse`=Doghouse · `outhouse`=Outhouse |
+
+⚠️ `bones`, `bell`, `lodge` and `tower` do **not** exist — they were removed or never shipped (invisible models; `lodge` is a suspected crash cause). Never offer them.
+
 ---
 
 ## 6. Config-only features (no command — surface as info, not buttons)
@@ -385,6 +432,7 @@ These have **no in-game command**; they're `mod_wowlegends.conf` toggles (apply 
 - **Talk-and-command** (plain-English orders, §4) — `WowLegends.AiCommand.Enabled` (**0 — ships OFF**; ON on the PTR), `WowLegends.AiCommand.PartyOrders.Enabled` (1), `WowLegends.BotGuide.Enabled` (1, the Guide), `WowLegends.AiChat.Sage.Enabled` (1, the Sage).
 - **Legend Roads** (bot road-walking, §1.9) — `BotPathways.Enabled` (1), `.AllBots` (1), `.MaxSlopeDegrees` (20, range 5–45, baked into built data), `.ClimbWeight` (10, 0–100, baked), `.WaterCostFactor` (5, 1–50, live).
 - **Bot behaviour polish (v1.4.0, zero commands)** — `TriageHealer.Enabled` (1, healers prioritize real players), `VoiceCards.Enabled` (1, per-bot personalities), `SpeechGovernor.Enabled` (1, anti chat-spam), `AiChat.NoTrailingQuestions` (1).
+- **Warband Camps** (§1.10, v1.5.0) — `WowLegends.WarbandCamp.Enabled` (**0 — ships OFF**; 1 on the PTR), `.MaxProps` (200; **0 = unlimited**, read the live value off the `.camp` status line), `.ViewDistance` (40 yards before a camp phases in; 0 = no gate, clamped 20–250), `.AltsSameFactionOnly` (1), `.AutoAlts` (1 — a camp owner's other characters wake as bots and gather at the fire on login, no command needed).
 - **Dungeon Clear** — `mod_dungeon_clear.conf` (NEW FILE): `DungeonClear.Enable` (1, WL master switch) + ~30 upstream keys (pull tuning, rest targets, loot floor, `SpectateEnable`, `SpectateSpeed`…). Inspect live values with `.dc config` (§1.8).
 - **Realm MOTD** — NOT a config: it's the `motd` table in the auth DB; change with `.server set motd enUS <text>` (core command).
 
@@ -395,5 +443,6 @@ These have **no in-game command**; they're `mod_wowlegends.conf` toggles (apply 
 - Send **bot orders** as `$<command>` to **whisper** (one bot) or **PARTY/RAID chat** (all your bots). Never send a bot order without the `$` — it'd post as normal chat / AI-chat.
 - A GM sees/uses everything; gate **[GM]** buttons behind the player's GM status (the server still enforces it).
 - **Dungeon Clear announcements are invisible without a listener** (§1.8): register for `CHAT_MSG_ADDON` prefix `DC` and print `CHAT\t<text>` payloads to the chat frame (errors already arrive as normal whispers). Richer payloads (`STATUS\t…`, `BOSS\t…`) exist on the same prefix for a future status panel.
+- **Warband Camps ship OFF** (§1.10): probe once per session with bare `.camp` and read the CHAT_MSG_SYSTEM reply — `Warband Camps are not enabled on this realm.` means hide/grey the controls. The same status line carries the live prop cap (`N of M things` vs `N things` = unlimited), so never hardcode 200. `.camp catalogue` [GM] **destroys the caller's own props** — confirm it like any disruptive action.
 - Good panels: **Party builder** (addclass per class + "Summon all" → party `$summon`), **Role setter** (`$talents spec <name>` per bot, auto-pick by class via §3 mapping), **Combat bar** (`$attack`/`$tank attack`/`$pull`/`$max dps`/`$flee`/`$focus heal`), **GM Events** (`.worldpvp start/stop/status`, `.wlevent start <zone>/stop/status` with the §5.5 zone dropdown), **Companion** (`.companion create/summon/dismiss/forget`).
 - Core/standard AzerothCore GM commands (`.tele`, `.go`, `.modify`, `.npc`, `.lookup`, `.ban`, `.account`, `.server`, …) are unchanged from AzerothCore — pull those from the AC wiki; this doc covers only WL-custom + playerbot + the `$` bot orders.
