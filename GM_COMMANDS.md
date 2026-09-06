@@ -458,7 +458,6 @@ These have **no in-game command**; they're `mod_wowlegends.conf` toggles (apply 
 - **Frostmind** (v1.6.0) — an archivist NPC; **ships off**: `WowLegends.Frostmind.Enabled` (**0**), `.AiAsk` (1).
 - **Alt repair** — `playerbots.conf`: `AiPlayerbot.AltMaintenanceRepair` (1) — your alt bots repair during maintenance (random bots always do).
 
-⚠️ **The v1.6.0 keys above are NOT in the shipped `mod_wowlegends.conf.dist`** (checked 2026-09-06) — the defaults listed here were read from the module source, not from the dist. Do not tell an owner to look for them in their conf file until the repack adds them.
 
 - **Realm MOTD** — NOT a config: it's the `motd` table in the auth DB; change with `.server set motd enUS <text>` (core command).
 
