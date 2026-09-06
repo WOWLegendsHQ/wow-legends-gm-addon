@@ -45,7 +45,7 @@ local RunControl = {
 
 local Info = {
     { id="dc_status", label="Status", format=".dc status", level=0, group="DungeonClear",
-      tooltip="One-liner: 'Dungeon clear: on/off. Next boss: <name>. Skipped: <n>.' (+ ' Stalled: <reason>' when stuck).\nWorks while the run is off. ('.dc status addon' suppresses the chat line for addons.)" },
+      tooltip="One-liner: 'Dungeon clear: on/off. Next boss: <name>. Skipped: <n>.'\nA paused run reports 'on (PAUSED)' and adds \"Paused: <reason>. Say 'dc pause' to resume.\" - the reason reads 'holding position' when the pause site gave none.\n(+ ' Stalled: <reason>' when stuck.) Works while the run is off. ('.dc status addon' suppresses the chat line for addons.)" },
     { id="dc_bosses", label="List bosses", format=".dc bosses", level=0, group="DungeonClear",
       tooltip="Full roster for the dungeon: every boss/objective/event with position and live state (alive / dead / skipped), wing-aware and faction-filtered.\nWorks while the run is off." },
     { id="dc_config", label="Show config", format=".dc config", level=0, group="DungeonClear",
@@ -69,6 +69,8 @@ WLGM.RegisterTab({
         .. "(lowest-GUID tank bot in a party; Main Tank / best-geared tank bot in a raid; a real-player tank is never eligible) - "
         .. "ANY real player in that bot's group may issue them. No tank bot in the group -> 'No tank bot found in your group.'\n"
         .. "Chat works too while INSIDE the dungeon: whisper the tank (or /party) $dc on/off/pause/skip/pull/status/bosses. "
+        .. "Since repack v1.6.0 plain speech works inside an instance too, said in party chat with no $: "
+        .. "'start pulling', 'stop', 'pause' (a toggle - the same word resumes), 'skip this boss', 'status'. "
         .. "The tank's progress announcements ride a hidden addon channel - this addon prints them to your chat as [Dungeon Clear] lines automatically.\n"
         .. "Server master switch: DungeonClear.Enable in mod_dungeon_clear.conf (default on).")
     end,
