@@ -101,6 +101,7 @@ Operates on a targeted bot/player (GM tool; players use `.companion` + addclass 
 | `.gear epic` | Full epic (purple) set. |
 | `.gear max` | Best available for the level. |
 | `.gear undress` | Strip all gear. |
+| `.gear pvp [season] [player]` | **(v1.7.0)** Complete arena-season PvP set: Gladiator's pieces for class and spec, PvP gems and enchants, the PvP trinket (skipped for Humans and Forsaken, who have it as a racial), repaired; old gear to bags. Seasons weakest -> strongest: `savage` · `hateful` · `deadly` (S5) · `furious` (S6) · `relentless` (S7) · `wrathful` (S8, **default**). A slot the season cannot fill falls back to an earlier one. Target = named player, else selection, else self. Refuses in combat; needs level 70-80 (`no PvP items fit this character`). GM-only unless `WowLegends.Gear.PvpForPlayers = 1` (§6), and then a player can only gear themselves, never in a BG/arena. The only `.gear` subcommand that runs from RA/console (with a name). Example: `.gear pvp relentless` |
 
 ### 1.6 `.hardcore` + `.makgora` — permadeath **[P]**
 | Command | What it does |
@@ -172,13 +173,26 @@ A permanent personal camp on any patch of open world. The camp belongs to the **
 | `.camp props` | [P] | Prints every prop **key**, three per line, then `Stand where you want it and use .camp place <name>.` **(v1.6.0)** it then prints `People you can bring in (up to 6):` followed by the staff keys — one list, two named groups. The keys are the §5.6 lists. Example: `.camp props` |
 | `.camp place <name>` | [P] | Puts one thing up **in front of you** (bigger props stand further out; standing on a table places at table height, not the floor). You must be **within 32 yd of the camp centre and on the ground**. Success: `<Label> set up (N of M).` / `<Label> set up (N so far).` **3-second per-prop cooldown** → debounce the button; too fast = `Steady on - one thing at a time.` Other replies: `Place what? .camp props lists everything.` · `There is no 'X'. Try .camp props.` (name matching is case-insensitive) · `You have to be standing in your camp. .camp go will take you there.` · `Put your feet on the ground first.` · `Your camp is full (N things). Take something down with .camp remove.` · `That is right on the edge of your camp, so it went down at your feet.` (info, not an error) · `That would not stand up here. Try a step to one side.` · `That could not be saved. Please tell an admin.` (server-side DB problem). **(v1.6.0)** the same command places **staff** by key (`.camp place banker`); staff have their own cap of **6**, independent of the prop cap, and guards spawn on the **placer's faction**. Example: `.camp place campfire` |
 | `.camp remove` | [P] | Packs away the **nearest prop within 10 yd** → `<Label> packed away.` **(v1.6.0)** it also takes down staff, with a different reply: `<Label> leaves your camp.` — parse both. Nothing that close → `Stand closer to whatever you want to take down.` Nothing placed at all → `There is nothing set up here yet.` Must be standing in the camp. Example: `.camp remove` |
+| `.camp rotate [left\|right\|<degrees>\|face]` | [P] | **(v1.7.0)** Turns the nearest prop or staff member in your camp. No argument = 45 degrees clockwise; `left`/`right` = 45 degrees either way; a number = that many degrees (-360 to 360); `face` (or `me`) = turn it to face you. Reply `<Label> turned.`; bad argument prints the usage line. Must be standing in the camp. Example: `.camp rotate face` |
 | `.camp alts` | [P] | Wakes your other characters as bots and seats them round the fire — **max 8**, ungrouped, follow stood down, quietly strolling the camp. Normally automatic at login (`AutoAlts=1`, §6); this is the manual re-gather. Must be standing in the camp. Replies `Your warband is being roused - they will gather at the fire over the next few moments.` / `You have no other characters on this realm.` To take one adventuring, **whisper that alt `follow`** — a bot order, not a dot-command. Example: `.camp alts` |
 | `.camp catalogue` | **[GM]** | Screenshot rig, **not** a player tool: **wipes your own camp's props**, then lays the ENTIRE catalogue out on an 8x8 grid around you and lists the labels in placement order (centre outward), so every prop can be photographed. You must be standing in the camp. Slots that fail the flatness check are skipped → `Catalogue laid out: N placed, M skipped (K slots passed the flatness check).` + `Not enough level ground here for all of them - try somewhere flatter, Mulgore is ideal.` Example: `.camp catalogue` |
 | `.camp diag <name>` | **[ADMIN]** *(console/RA OK)* | Admin self-test aimed at any **online** character (a bot will do — it takes a NAME, not a selection, precisely so it runs from RA). Reports map/zone/area/position, outdoors + ground delta + water + phase mask, whether a claim would be `ALLOWED` (or the blocker string), the phase bit it would hand out and the realm's camp count — then really spawns one prop through the real spawn path, proves it exists in the map, and takes it back out. Also exercises the proximity-phase pipeline with a throwaway camp. `No online character called 'X'.` **The only `.camp` subcommand that works from RA/console.** Example: `.camp diag Claudius` |
 
 *Everything except `diag` is `Console::No` — in-game only, exactly like `.path` (§1.7) and `.dc` (§1.8). All replies arrive as **CHAT_MSG_SYSTEM** lines carrying `|cffffff00…|r` colour codes: strip the codes before matching.*
 
-⚠️ **Repack version:** `.camp` needs **repack v1.5.0 or newer**. Supporters have it; the free lane is still on v1.4.2 — do not present camp features as available to everyone.
+⚠️ **Repack version:** `.camp` needs **repack v1.5.0 or newer**. Both lanes have the base family now (the free release is v1.5.3). Newer parts need newer builds: **staff** v1.6.0+, **`.camp rotate` and the steward** v1.7.0+ — tag features by version, never present them as available on every realm.
+
+### 1.11 `.dkskip` — skip the Death Knight starting zone **[P]** *(v1.7.0, in-game only)*
+
+Suggested by **Jordan**. A new Death Knight still in Acherus can leave without replaying the Ebon Hold chain: every chain quest is marked rewarded (race/faction-matched, which also clears the Dungeon Finder's DK lock), the character is raised to `DkSkip.Level` (58) with talents recomputed, learns Runeforging, the Deathcharger and Death Gate exactly as the quests teach them, is geared at `DkSkip.GearQuality` (blue; old pieces to bags), and arrives before Varian or Thrall with the hearthstone bound.
+
+| Command | What it does |
+|---|---|
+| `.dkskip` | Explains the skip and asks for confirmation. |
+| `.dkskip confirm` | Does it - must follow within a minute. |
+
+Gate: `WowLegends.DkSkip.Mode` — `0` off · `1` **optional (default)**: a DK in Acherus is told about `.dkskip` and nothing happens unless they ask · `2` always: every new DK is skipped on first login.
+
 
 ---
 
@@ -433,6 +447,7 @@ People, not props: they are stored apart from the props, counted against their o
 | `banker` | Goblin Banker | |
 | `merchant` | Goblin Merchant | |
 | `barkeep` | Barmaid | |
+| `steward` | Camp Steward | **(v1.7.0)** repairs, mailbox, sickness removal, dungeon reset - suggested by **bengeldirk** |
 | `guard-human` | Human Guard | spawns on the **placer's faction** |
 | `guard-orc` | Orc Guard | spawns on the **placer's faction** |
 
@@ -459,6 +474,8 @@ These have **no in-game command**; they're `mod_wowlegends.conf` toggles (apply 
 - **Alt repair** — `playerbots.conf`: `AiPlayerbot.AltMaintenanceRepair` (1) — your alt bots repair during maintenance (random bots always do).
 
 
+- **PvP gearing for players** (v1.7.0, §1.5) — `WowLegends.Gear.PvpForPlayers` (**0** — `.gear pvp` is GM-only; 1 lets players gear themselves).
+- **Death Knight skip** (v1.7.0, §1.11) — `WowLegends.DkSkip.Mode` (**1**, optional), `.Level` (58), `.GearQuality` (3 = blue; 0 = keep the starting set).
 - **Realm MOTD** — NOT a config: it's the `motd` table in the auth DB; change with `.server set motd enUS <text>` (core command).
 
 ---

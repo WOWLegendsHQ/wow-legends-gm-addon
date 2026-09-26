@@ -131,6 +131,9 @@ local Gear = {
       tooltip="Full RARE (blue) set for the current level." },
     { id="gear_level", label="Gear: leveling", format=".gear level", level=2, wl=true, group="Legends",
       tooltip="Level-appropriate quest/dungeon-grade gear. Spec-aware." },
+    { id="gear_pvp", label="Gear: PvP set", format=".gear pvp %s", level=2, wl=true, group="Legends",
+      args={ {key="season",placeholder="season: wrathful",optional=true,choices={"wrathful","relentless","furious","deadly","hateful","savage"},width=130} },
+      tooltip="Complete arena-season PvP set on the targeted player (or yourself): Gladiator's pieces for class and spec, PvP gems and enchants, a PvP trinket (not for Humans/Forsaken, who have it as a racial), repaired. Old gear goes to bags.\nSeason defaults to Wrathful (S8). Needs level 70-80, not in combat. Repack v1.7.0+." },
     { id="gear_undress", label="Undress", format=".gear undress", level=2, wl=true, group="Legends", danger=true,
       tooltip="Strip all equipped items from the target into their bags." },
 }
