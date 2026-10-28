@@ -84,6 +84,7 @@ WLGM.RegisterTab({
     id = "items", label = "Items",
     builder = function(parent)
         WLGM.BuildSubTabs(parent, {
+            { label = "Find & Add",  builder = WLGM.BuildItemFinder },
             { label = "Add",         rows = Add,    layoutOpts = { yTop = 8, sectionTitle = "Add items & item sets" } },
             { label = "Manage",      rows = Manage, layoutOpts = { yTop = 8, sectionTitle = "Move, restore & refund items" } },
             { label = "Send & Mail", rows = Send,   layoutOpts = { yTop = 8, sectionTitle = "Send items, money & mail", rowsPerColumn = 7, columnWidth = 430 } },

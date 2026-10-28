@@ -69,7 +69,7 @@ The **Bots** tab has a scope selector — *All my bots (party)* or *Targeted bot
 | **★ Legends** | Companion · Hardcore + Mak'gora · Paths · XP rate · Gear · World PvP · Battlefronts |
 | **General** | GM toggles, cheats, morph/mount, self modify (scale/speed), utilities |
 | **Player** | Modify, spells, learn, reset, character ops, stats, instances/groups, guild |
-| **Items** | Add items, send mail/money, bags, lookup |
+| **Items** | Find & Add (search items by name, pick a count, one-click add), add items, send mail/money, bags, lookup |
 | **NPC** | Spawn/manage, the `.npc set` family, lookup |
 | **Object** | Gameobject add/move/turn/info, lookup |
 | **Teleport** | Searchable browser of all `.teleport` destinations + the full `.go` family |
@@ -101,7 +101,7 @@ Destructive commands (ban, kick, delete, reset, shutdown, …) ask for confirmat
 
 ### Slash commands
 
-`/wlgm` (also `/gm`, `/gmpanel`) toggles the panel. Sub-commands: `reset` (recenter panel + button), `show` / `hide`, `search <text>`, `debug` (module load status), and `probe <command>` — send a command and echo the server's response inline, e.g. `/wlgm probe .gps`.
+`/wlgm` (also `/gm`, `/gmpanel`) toggles the panel. Sub-commands: `reset` (recenter panel + button), `show` / `hide`, `search <text>`, `item <name>` (open Items > Find & Add and search by name), `debug` (module load status), and `probe <command>` — send a command and echo the server's response inline, e.g. `/wlgm probe .gps`.
 
 ### Access tiers
 

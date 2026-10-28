@@ -120,6 +120,9 @@ SlashCmdList["WLGM"] = function(msg)
         if WoWLegendsGM_MainFrame then WoWLegendsGM_MainFrame:Hide() end
     elseif lcmd == "debug" then
         WLGM.DumpDebug()
+    elseif lcmd == "item" or lcmd:sub(1, 5) == "item " then
+        if WoWLegendsGM_MainFrame then WoWLegendsGM_MainFrame:Show() end
+        if WLGM.OpenItemFinder then WLGM.OpenItemFinder(msg:sub(6)) end
     elseif lcmd:sub(1, 6) == "search" then
         if WLGM.OpenSearch then WLGM.OpenSearch(msg:sub(7)) end
     else

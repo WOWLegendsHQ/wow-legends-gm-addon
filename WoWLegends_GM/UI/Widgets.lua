@@ -447,6 +447,7 @@ function WLGM.BuildSubTabs(parent, subTabsDef, dbKey)
 
         local content = CreateFrame("Frame", nil, subContent)
         content:SetAllPoints(subContent)
+        content.selectSelf = function() selectSub(i) end
         content:Hide()
 
         if def.rows then WLGM.BuildScrollRows(content, def.rows, def.layoutOpts) end

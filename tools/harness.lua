@@ -114,11 +114,18 @@ UIDropDownMenu_AddButton = function() end
 UIDropDownMenu_SetText = function() end
 UIDropDownMenu_SetSelectedValue = function() end
 
+-- Chat filter + item cache API (Items > Find & Add)
+ChatFrame_AddMessageEventFilter = function() end
+ChatEdit_InsertLink = function() return false end
+GetItemInfo = function() return nil end
+GetItemIcon = function() return nil end
+ITEM_QUALITY_COLORS = {}
+
 -- ─── Load addon in TOC order ────────────────────────────────────────────────
 local files = {
-    "Core/Init.lua", "Core/Util.lua", "Core/SavedVars.lua", "Core/CommandRunner.lua",
+    "Core/Init.lua", "Core/Util.lua", "Core/SavedVars.lua", "Core/CommandRunner.lua", "Core/ItemSearch.lua",
     "Data/Catalog.lua", "Data/CatalogLocal.lua", "Data/Teleports.lua",
-    "UI/ConfirmDialog.lua", "UI/Widgets.lua", "UI/MainFrame.lua",
+    "UI/ConfirmDialog.lua", "UI/Widgets.lua", "UI/MainFrame.lua", "UI/ItemFinder.lua",
     "UI/Tabs/Legends.lua", "UI/Tabs/General.lua", "UI/Tabs/Player.lua", "UI/Tabs/Items.lua",
     "UI/Tabs/NPC.lua", "UI/Tabs/Object.lua", "UI/Tabs/Teleport.lua", "UI/Tabs/Quest.lua",
     "UI/Tabs/Server.lua", "UI/Tabs/Moderation.lua", "UI/Tabs/Bots.lua", "UI/Tabs/DungeonClear.lua",
@@ -162,6 +169,27 @@ if WLGM.LayoutRows then
             table.insert(ERRORS, "LayoutRows height collapse: " .. (rpc * 2) .. " rows / " .. rpc .. "-col returned " .. tostring(h))
         end
     end
+end
+
+-- Regression: the .lookup item reply parser (Core/ItemSearch.lua) must read
+-- both the in-game (linked) and console reply formats, and the end markers.
+if WLGM.ParseItemLookupLine then
+    local P = WLGM.ParseItemLookupLine
+    local cases = {
+        { "49623 - |cffffffff|Hitem:49623:0:0:0:0:0:0:0:0|h[Shadowmourne]|h|r ", "item", 49623, "Shadowmourne" },
+        { "6948 - Hearthstone", "item", 6948, "Hearthstone" },
+        { "No items found!", "none" },
+        { "Result limit reached (max results: 50)", "limit" },
+        { "You are being teleported", nil },
+    }
+    for _, c in ipairs(cases) do
+        local kind, id, name = P(c[1])
+        if kind ~= c[2] or (c[3] and (id ~= c[3] or name ~= c[4])) then
+            table.insert(ERRORS, "ParseItemLookupLine(" .. c[1] .. ") -> " .. tostring(kind) .. "," .. tostring(id) .. "," .. tostring(name))
+        end
+    end
+else
+    table.insert(ERRORS, "WLGM.ParseItemLookupLine missing")
 end
 
 -- ─── Fire events ────────────────────────────────────────────────────────────
