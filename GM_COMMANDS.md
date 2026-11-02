@@ -193,6 +193,49 @@ Suggested by **Jordan**. A new Death Knight still in Acherus can leave without r
 
 Gate: `WowLegends.DkSkip.Mode` — `0` off · `1` **optional (default)**: a DK in Acherus is told about `.dkskip` and nothing happens unless they ask · `2` always: every new DK is skipped on first login.
 
+### 1.12 Living World — `.bounty` `.nemesis` `.botlife` `.innkeeper` `.crowd` **[P]/[GM]** *(v1.8.0, every feature ships OFF)*
+
+Read from the command tables in `wowlegends_bounty.cpp`, `_nemesis`, `_botlife`, `_innkeepers` and `_makgora_crowd`. All GM subcommands are `Console::Yes` (RA works) except `.bounty` bare, `.crowd test` and `.crowd clear`. Name arguments are **character names**, not a selection. **Not here on purpose:** `.townraid` (moved to v1.9.0, stripped from the v1.8.0 build) and the Terminator (a hitman contract at W99; v1.9.0, stripped from the release branch).
+
+**`.bounty` — Most Wanted** (created and designed by **Cazius**). Gate: `WowLegends.Bounty.Enabled` (0).
+
+| Command | Tier | What it does |
+|---|---|---|
+| `.bounty` | [P] | Your own price, wanted level and Bounty Coins. In-game only. |
+| `.bounty top` | [P] | The most-wanted list. |
+| `.bounty status` | [GM] | Overview of the system. |
+| `.bounty set <char> <amount>` | [GM] | Set the bounty exactly; wanted level = floor(sqrt(amount / 10)) → 250 = W5, 1000 = W10, 4000 = W20. Online only. |
+| `.bounty coins <char> <amount>` | [GM] | Set Bounty Coins exactly. Online only. |
+| `.bounty addcoins <char> <amount>` | [GM] | Add coins. Works offline. |
+| `.bounty hunter [char]` | [GM] | Send a hunter now, ignoring smoke; blank = yourself. Online only. Reply `Bounty hunter on <name>: SENT (arrives in 3 s)` or the reason it was not. |
+| `.bounty hitman <target> <W> <delay s> <buyer>` | [GM] | A contract as if the buyer paid: wanted level W, after the delay. Target and buyer may be offline. `A hitman is already hunting <name>.` if one is out. The player shop caps W at `Shop.HitmanMaxWanted` (10, max 20); the addon offers 1-20. |
+| `.bounty reset <char>` | [GM] | Wipe the character's bounty record. Online only. |
+
+**`.nemesis` — Nemesis bots.** Gate: `WowLegends.Nemesis.Enabled` (0).
+
+| Command | What it does |
+|---|---|
+| `.nemesis status <player>` | `<name>: nemesis <bot> (...) \| player wins N / nemesis wins N \| rank N \| last hunt N min ago`, or `no nemesis`. Online only. |
+| `.nemesis set <player> <bot>` | Make that bot the player's nemesis. Both online. |
+| `.nemesis test <player>` | Send the hunt now → `Nemesis hunt on <name>: SENT` or the reason. Only where the player can be attacked. |
+| `.nemesis clear <player>` | `Nemesis of <name> cleared.` Online only - an offline name silently does nothing. |
+
+**`.botlife` — Bot life** (idea: **DeewaTT**). Gate: `WowLegends.BotLife.Enabled` (0). `status` · `on` · `off` (until restart) · `hour <0-23\|auto>` (pretend it is that hour; `auto` follows the clock again) · `census` (`Bot census: N bots \| in town/inns ... \| out in the world ...`).
+
+**`.innkeeper` — Innkeepers who know you** (idea: **Kneuma**). Gate: `WowLegends.Innkeepers.Enabled` (0).
+
+| Command | What it does |
+|---|---|
+| `.innkeeper status` | Feature state, current shift (and whether forced), night hours, each inn's day and night keeper. |
+| `.innkeeper shift [auto\|day\|night]` | Force a shift, or follow the clock. |
+| `.innkeeper deeds <player>` | The deeds the server remembers (last 20). Online only. |
+| `.innkeeper deed <player> <raid\|dungeon\|worldboss\|loot\|level\|pvp\|death\|quest> <what> [\| where]` | Record a deed by hand → `Deed recorded for <name>: ...`. Online only. |
+| `.innkeeper test <sw\|org\|dal-a\|dal-h> <player> [say text]` | The keeper on duty greets the player, or answers the line. The reply is AI-written and queued: `queued (see [aichat] in Server.log)` / `not queued (AI off, budget or queue full)`. |
+
+**`.crowd` — Duels get a crowd** (idea: **Cazius**). Defaults in `WowLegends.DuelCrowd.*` (off); every change lasts until a restart. Bare `.crowd` = status · `on`/`off` · `count <4-160\|auto>` · `radius <4-30>` · `duels makgora\|all` · `props on\|off` (torches, banners, braziers) · `walls on\|off` (a duelist at the edge is shoved back in) · `pillars <0-4>` (half-size arena pillars that block line of sight) · `test [seconds]` (ring around the GM; in-game only) · `clear` (in-game only).
+
+*Addon: the **Living World** tab, one sub-tab per family.*
+
 
 ---
 

@@ -119,7 +119,7 @@ local files = {
     "Core/Init.lua", "Core/Util.lua", "Core/SavedVars.lua", "Core/CommandRunner.lua",
     "Data/Catalog.lua", "Data/CatalogLocal.lua", "Data/Teleports.lua",
     "UI/ConfirmDialog.lua", "UI/Widgets.lua", "UI/MainFrame.lua",
-    "UI/Tabs/Legends.lua", "UI/Tabs/General.lua", "UI/Tabs/Player.lua", "UI/Tabs/Items.lua",
+    "UI/Tabs/Legends.lua", "UI/Tabs/World.lua", "UI/Tabs/General.lua", "UI/Tabs/Player.lua", "UI/Tabs/Items.lua",
     "UI/Tabs/NPC.lua", "UI/Tabs/Object.lua", "UI/Tabs/Teleport.lua", "UI/Tabs/Quest.lua",
     "UI/Tabs/Server.lua", "UI/Tabs/Moderation.lua", "UI/Tabs/Bots.lua", "UI/Tabs/DungeonClear.lua",
     "UI/Tabs/Search.lua", "UI/Tabs/Favorites.lua", "UI/Tabs/History.lua", "UI/ToggleButton.lua",

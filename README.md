@@ -67,6 +67,7 @@ The **Bots** tab has a scope selector — *All my bots (party)* or *Targeted bot
 | Tab | What's inside |
 |---|---|
 | **★ Legends** | Companion · Hardcore + Mak'gora · Paths · XP rate · Gear · World PvP · Battlefronts |
+| **★ Living World** | Most Wanted bounties (`.bounty`) · Nemesis bots · Bot life · Innkeepers who know you · the duel crowd (`.crowd`) — repack v1.8.0 |
 | **General** | GM toggles, cheats, morph/mount, self modify (scale/speed), utilities |
 | **Player** | Modify, spells, learn, reset, character ops, stats, instances/groups, guild |
 | **Items** | Add items, send mail/money, bags, lookup |

@@ -25,6 +25,7 @@ UI\MainFrame.lua
 
 # ─── Tabs (registration order = display order) ────────────────────────────
 UI\Tabs\Legends.lua
+UI\Tabs\World.lua
 UI\Tabs\General.lua
 UI\Tabs\Player.lua
 UI\Tabs\Items.lua
