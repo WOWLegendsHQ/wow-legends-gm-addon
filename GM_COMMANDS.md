@@ -218,7 +218,7 @@ Read from the command tables in `wowlegends_bounty.cpp`, `_nemesis`, `_botlife`,
 | `.nemesis status <player>` | `<name>: nemesis <bot> (...) \| player wins N / nemesis wins N \| rank N \| last hunt N min ago`, or `no nemesis`. Online only. |
 | `.nemesis set <player> <bot>` | Make that bot the player's nemesis. Both online. |
 | `.nemesis test <player>` | Send the hunt now → `Nemesis hunt on <name>: SENT` or the reason. Only where the player can be attacked. |
-| `.nemesis clear <player>` | `Nemesis of <name> cleared.` Online only - an offline name silently does nothing. |
+| `.nemesis clear <player>` | `Nemesis of <name> cleared.` Online only (`<name> is not online.`). |
 
 **`.botlife` — Bot life** (idea: **DeewaTT**). Gate: `WowLegends.BotLife.Enabled` (0). `status` · `on` · `off` (until restart) · `hour <0-23\|auto>` (pretend it is that hour; `auto` follows the clock again) · `census` (`Bot census: N bots \| in town/inns ... \| out in the world ...`).
 

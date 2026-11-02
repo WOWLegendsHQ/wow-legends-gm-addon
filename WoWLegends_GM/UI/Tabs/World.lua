@@ -70,7 +70,7 @@ local Nemesis = {
       tooltip="Send the player's nemesis after them right now. Only where they can be attacked (World PvP or flagged), never in towns or instances." },
     { id="nem_clear", label="Clear nemesis", format=".nemesis clear %s", level=2, wl=true, group="World", danger=true,
       args={ who("online player") },
-      tooltip="Remove the player's nemesis. The player must be online (an offline name does nothing)." },
+      tooltip="Remove the player's nemesis. The player must be online." },
 }
 
 -- --- Bot life (day rhythm) ------------------------------------------------------
