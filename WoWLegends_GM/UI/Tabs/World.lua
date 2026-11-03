@@ -150,11 +150,11 @@ WLGM.RegisterTab({
     id = "world", label = "Living World", wl = true,
     builder = function(parent)
         WLGM.BuildSubTabs(parent, {
-            { label = "Most Wanted", builder = section("Bounties (repack v1.8.0, created and designed by Cazius). Kill the other faction and your price climbs; masked bounty hunters come to collect, a smoke bomb throws them off, hitmen can be bought. Off by default: WowLegends.Bounty.Enabled.", Bounty) },
-            { label = "Nemesis",     builder = section("Nemesis bots (v1.8.0): a bot you killed holds a grudge and now comes looking for you out in the world. Beat it five times and it gives up. Off by default: WowLegends.Nemesis.Enabled.", Nemesis) },
+            { label = "Most Wanted", builder = section("Bounties (repack v1.8.0, created and designed by Cazius). Kill the other faction and your price climbs; masked bounty hunters come to collect, a smoke bomb throws them off, hitmen can be bought. On by default: WowLegends.Bounty.Enabled.", Bounty) },
+            { label = "Nemesis",     builder = section("Nemesis bots (v1.8.0): a bot you killed holds a grudge and now comes looking for you out in the world. Beat it five times and it gives up. On by default: WowLegends.Nemesis.Enabled.", Nemesis) },
             { label = "Bot life",    builder = section("Bot life (v1.8.0, idea: DeewaTT): bots follow the realm clock - town in the morning, questing by day, inns in the evening, rest at night. Off by default: WowLegends.BotLife.Enabled.", BotLife) },
             { label = "Innkeepers",  builder = section("Innkeepers who know you (v1.8.0): the keepers of Stormwind, Orgrimmar and Dalaran greet players by name, know their latest deeds and can be talked to. Off by default: WowLegends.Innkeepers.Enabled.", Innkeepers) },
-            { label = "Duel crowd",  builder = section("Duels get a crowd (v1.8.0, idea: Cazius): the duelists' city guards form a cheering ring. Changes here last until a restart; WowLegends.DuelCrowd.* in the conf are the defaults (off).", Crowd) },
+            { label = "Duel crowd",  builder = section("Duels get a crowd (v1.8.0, idea: Cazius): the duelists' city guards form a cheering ring. On by default, for every duel. Changes here last until a restart; WowLegends.DuelCrowd.* in the conf are the defaults.", Crowd) },
         }, "world")
     end,
 })
