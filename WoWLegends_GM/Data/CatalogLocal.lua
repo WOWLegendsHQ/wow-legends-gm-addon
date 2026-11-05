@@ -24,9 +24,10 @@ local OVERRIDES = {
     -- (wowlegends_warbandcamp.cpp command table, verified 2026-08-09) and are
     -- GM/admin tools, which is exactly what this addon is for. See
     -- GM_COMMANDS.md section 1.10.
-    -- NOTE for the next catalog regen: these two APPEND on purpose, so the
-    -- harness count is the website total + 2. That is NOT the anchor-drift
-    -- symptom - check the 'talents spec' rows enriched in place instead.
+    -- Since the v1.8.0 site list (web 5790df7, 2026-11-06) the website carries
+    -- these two as well, so they now ENRICH like every other row here: the
+    -- harness count equals the website total. A count ABOVE the website total
+    -- means an overlay name stopped matching - re-anchor it.
     { n = ".camp catalogue", l = 2, g = "warband camp", u = ".camp catalogue",
       d = "GM screenshot rig: WIPES your own camp's props, then lays the entire 69-piece catalogue out on a grid around you and lists the labels in placement order. Stand in your camp; slots that fail the flatness check are skipped (flat ground like Mulgore works best). Not a player tool.",
       w = 1 },
@@ -35,10 +36,10 @@ local OVERRIDES = {
       w = 1 },
 
     -- v1.8.0 Living World GM subcommands (read from the mod-wowlegends command
-    -- tables, 2026-11-02). The website lists only the player rows and a single
-    -- .crowd summary, so these APPEND today; if the site ever adds one under the
-    -- same name it ENRICHES instead, so nothing doubles up. Same rows as the
-    -- Living World tab (UI/Tabs/World.lua).
+    -- tables, 2026-11-02). The website added them under the same names for
+    -- v1.8.0 (web 5790df7), so they ENRICH in place; if the site ever drops one
+    -- it APPENDS again, so Search never loses it. Same rows as the Living World
+    -- tab (UI/Tabs/World.lua).
     { n = ".bounty status", l = 2, g = "most wanted", u = ".bounty status", d = "GM overview of the bounty system and its live settings.", w = 1 },
     { n = ".bounty set", l = 2, g = "most wanted", u = ".bounty set <char> <amount>", d = "Set a character's bounty exactly; wanted level = floor(sqrt(amount / 10)): 250 = W5, 1000 = W10, 4000 = W20. Online only.", w = 1 },
     { n = ".bounty coins", l = 2, g = "most wanted", u = ".bounty coins <char> <amount>", d = "Set a character's Bounty Coins exactly. Online only.", w = 1 },
